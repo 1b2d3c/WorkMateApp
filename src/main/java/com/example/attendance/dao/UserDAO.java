@@ -11,12 +11,12 @@ import com.example.attendance.dto.User;
 public class UserDAO {
 	private static final Map<String, User> users = new HashMap<>(); 
 	 
-    static { 
-        // Sample users with hashed passwords 
-        users.put("employee1", new User("employee1", hashPassword("password"), "employee", true)); 
-        users.put("admin1", new User("admin1", hashPassword("adminpass"), "admin", true)); 
-        users.put("employee2", new User("employee2", hashPassword("password"), "employee", true)); 
-    } 
+//    static { 
+//        // Sample users with hashed passwords 
+//        users.put("employee1", new User("employee1", hashPassword("password"), "employee", true)); 
+//        users.put("admin1", new User("admin1", hashPassword("adminpass"), "admin", true)); 
+//        users.put("employee2", new User("employee2", hashPassword("password"), "employee", true)); 
+//    } 
  
     public User findByUsername(String username) { 
         return users.get(username); 
