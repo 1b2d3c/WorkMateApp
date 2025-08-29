@@ -10,7 +10,6 @@ import com.example.attendance.dto.User;
 
 public class UserDAO {
 	private static final Map<String, User> users = new HashMap<>(); 
-	 
 //    static { 
 //        // Sample users with hashed passwords 
 //        users.put("employee1", new User("employee1", hashPassword("password"), "employee", true)); 

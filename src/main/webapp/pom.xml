@@ -1,7 +1,7 @@
 <dependencies>
-	<dependency>
-		<groupId>org.postgresql</groupId>
-		<artifactId>postgresql</artifactId>
-		<version>16.0.0</version>
-	</dependency>
+<dependency>
+<groupId>org.postgresql</groupId>
+<artifactId>postgresql</artifactId>
+<version>16.0.0</version>
+</dependency>
 </dependencies>
