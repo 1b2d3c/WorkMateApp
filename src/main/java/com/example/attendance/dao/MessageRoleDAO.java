@@ -14,9 +14,9 @@ import com.example.attendance.dto.MessageRole;
  * `messages_roles` テーブルへのデータベースアクセスを行うDAOクラス。
  */
 public class MessageRoleDAO {
-    private static final String URL = "jdbc:postgresql://localhost:5432/kintai_db";
-    private static final String USER = "your_db_user";
-    private static final String PASSWORD = "your_db_password";
+	private static final String URL = "jdbc:postgresql://localhost:5432/workmate_db";
+    private static final String USER = "postgres";
+    private static final String PASSWORD = "postgres";
 
     /**
      * 新しいメッセージと役割の関連付けをデータベースに挿入します。

@@ -15,9 +15,9 @@ import com.example.attendance.dto.User;
  * `users` テーブルへのデータベースアクセスを行うDAOクラス。
  */
 public class UserDAO {
-    private static final String URL = "jdbc:postgresql://localhost:5432/kintai_db";
-    private static final String USER = "your_db_user";
-    private static final String PASSWORD = "your_db_password";
+    private static final String URL = "jdbc:postgresql://localhost:5432/workmate_db";
+    private static final String USER = "postgres";
+    private static final String PASSWORD = "postgres";
 
     /**
      * 新しいユーザーをデータベースに挿入します。

@@ -16,9 +16,9 @@ import com.example.attendance.dto.Attendance;
  * `attendance` テーブルへのデータベースアクセスを行うDAOクラス。
  */
 public class AttendanceDAO {
-    private static final String URL = "jdbc:postgresql://localhost:5432/kintai_db";
-    private static final String USER = "your_db_user";
-    private static final String PASSWORD = "your_db_password";
+	private static final String URL = "jdbc:postgresql://localhost:5432/workmate_db";
+    private static final String USER = "postgres";
+    private static final String PASSWORD = "postgres";
 
     public boolean insertAttendance(Attendance attendance) {
         String sql = "INSERT INTO attendance (user_id, check_in_time, check_out_time) VALUES (?, ?, ?)";
