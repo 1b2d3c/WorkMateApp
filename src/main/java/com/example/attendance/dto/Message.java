@@ -8,16 +8,16 @@ import java.time.LocalDateTime;
  */
 public class Message {
     private int messageId;
-    private String message;
+    private String messageText;
     private String priority; // DBのpriorityに対応
     private LocalDateTime startDatetime;
     private LocalDateTime endDatetime;
 
     public Message() {}
 
-    public Message(int messageId, String message, String priority, LocalDateTime startDatetime, LocalDateTime endDatetime) {
+    public Message(int messageId, String messageText, String priority, LocalDateTime startDatetime, LocalDateTime endDatetime) {
         this.messageId = messageId;
-        this.message = message;
+        this.messageText = messageText;
         this.priority = priority;
         this.startDatetime = startDatetime;
         this.endDatetime = endDatetime;
@@ -32,12 +32,12 @@ public class Message {
         this.messageId = messageId;
     }
 
-    public String getMessage() {
-        return message;
+    public String getMessageText() {
+        return messageText;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setMessageText(String messageText) {
+        this.messageText = messageText;
     }
 
     public String getPriority() {

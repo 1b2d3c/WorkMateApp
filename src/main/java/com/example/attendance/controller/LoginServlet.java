@@ -34,9 +34,9 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("user", user);
 
             if ("manager".equals(user.getRole())) {
-                response.sendRedirect(request.getContextPath() + "/manager.jsp");
+                response.sendRedirect(request.getContextPath() + "/manager");
             } else if ("employee".equals(user.getRole())) {
-                response.sendRedirect(request.getContextPath() + "/employee.jsp");
+                response.sendRedirect(request.getContextPath() + "/employee");
             } else {
                 // 不正なロール
                 request.setAttribute("error", "不正なロールです。");

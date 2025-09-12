@@ -6,21 +6,24 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c&family=Yusei+Magic&display=swap" rel="stylesheet">
 <title>従業員ダッシュボード</title>
-<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/style.css">
 </head>
-<body>
+<body class="employeepage">
 	<header>
 		<h1>従業員ダッシュボード</h1>
+		<nav>
+			<a href="${pageContext.request.contextPath}/logout">ログアウト</a>
+		</nav>
 	</header>
 	<div class="container">
-		<div class="status-box <c:if test="statuseq 
-′
- 出勤中 
-′
- "active\
-			</c:if\<c:iftest="{status eq '退勤済み'}">inactive</c:if>">
-<h3>現在のステータス: <c:out value="status"/\</h3\<formaction="employee"method="post"\<c:iftest="{status eq '退勤済み'}">
+		<div class="status-box <c:if test="${status eq '出勤中'}">active</c:if><c:if test="${status eq '退勤済み'}">inactive</c:if>">
+<h3>現在のステータス: <c:out value="${status}"/></h3>
+<form action="${pageContext.request.contextPath}/employee" method="post">
+<c:if test="${status eq '退勤済み'}">
 <input type="hidden" name="action" value="check_in">
 <button type="submit" class="action-button check-in">出勤</button>
 </c:if>
@@ -53,8 +56,14 @@
         </table>
 
         <h2 style="margin-top: 2em;">連絡事項</h2>
-        <p>※ここは、付与されたロールまたは従業員全体への連絡事項が表示される場所です。</p>
-        <!-- TODO: 連絡事項の表示ロジックを実装 -->
+        <div class="message-list">
+            <c:forEach items="${messages}" var="message">
+                <div class="message-item">
+                    <h3><c:out value="${message.priority}"/>: <c:out value="${message.messageText}"/></h3>
+                    <p>期間: <c:out value="${message.startDatetime}"/> - <c:out value="${message.endDatetime}"/></p>
+                </div>
+            </c:forEach>
+        </div>
     </div>
 </div>
 

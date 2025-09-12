@@ -6,23 +6,42 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c&family=Yusei+Magic&display=swap" rel="stylesheet">
 <title>管理者ダッシュボード</title>
-<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/style.css">
 </head>
-<body>
+<body class="managerpage">
 	<header>
 		<h1>管理者ダッシュボード</h1>
 	</header>
 	<nav>
-		<a href="manager?action=view_attendance">勤怠管理</a> <a
-			href="manager?action=view_users">ユーザー管理</a> <a
-			href="manager?action=view_messages">連絡事項管理</a> <a href="logout">ログアウト</a>
+		<a href="${pageContext.request.contextPath}/manager?action=view_attendance">勤怠管理</a>
+		<a href="${pageContext.request.contextPath}/manager?action=view_users">ユーザー管理</a>
+		<a href="${pageContext.request.contextPath}/manager?action=view_messages">連絡事項管理</a>
+		<a href="${pageContext.request.contextPath}/logout">ログアウト</a>
 	</nav>
 	<div class="container">
 		<div class="content">
 			<c:choose>
-				<c:when test="${param.page == 'attendance'}">
+				<c:when test="${page == 'attendance'}">
 					<h2>勤怠管理</h2>
+					<div class="form-section">
+						<h3>勤怠履歴の追加/削除</h3>
+						<form action="manager" method="post">
+							<input type="hidden" name="action" value="add_attendance">
+							<input type="number" name="user_id" placeholder="ユーザーID" required>
+							<input type="datetime-local" name="check_in" required>
+							<input type="datetime-local" name="check_out">
+							<input type="submit" value="追加">
+						</form>
+						<form action="manager" method="post" style="margin-top: 1em;">
+							<input type="hidden" name="action" value="delete_attendance">
+							<input type="number" name="attendance_id" placeholder="勤怠ID" required>
+							<input type="submit" value="削除">
+						</form>
+					</div>
 					<h3>従業員全体の勤怠履歴</h3>
 					<h4>詳細勤怠履歴</h4>
 					<form action="manager" method="get">
@@ -41,54 +60,26 @@
 							</tr>
 						</thead>
 						<tbody>
-							</tbody>
-					</table>
-					<div class="form-section">
-						<h3>勤怠履歴の追加/削除</h3>
-						<form action="manager" method="post">
-							<input type="hidden" name="action" value="add_attendance">
-							<input type="number" name="user_id" placeholder="ユーザーID" required>
-							<input type="datetime-local" name="check_in" required>
-							<input type="datetime-local" name="check_out">
-							<input type="submit" value="追加">
-						</form>
-						<form action="manager" method="post" style="margin-top: 1em;">
-							<input type="hidden" name="action" value="delete_attendance">
-							<input type="number" name="attendance_id" placeholder="勤怠ID" required>
-							<input type="submit" value="削除">
-						</form>
-					</div>
-				</c:when>
-				<c:when test="${param.page == 'users'}">
-					<h2>ユーザー管理</h2>
-					<table>
-						<thead>
-							<tr>
-								<th>ID</th>
-								<th>ユーザー名</th>
-								<th>役割</th>
-								<th>有効</th>
-								<th>操作</th>
-							</tr>
-						</thead>
-						<tbody>
-							<c:forEach items="${users}" var="user">
+							<c:forEach items="${attendanceList}" var="attendance">
 								<tr>
-									<td><c:out value="${user.userId}" /></td>
-									<td><c:out value="${user.username}" /></td>
-									<td><c:out value="${user.role}" /></td>
-									<td><c:out value="${user.enabled ? '有効' : '無効'}" /></td>
+									<td><c:out value="${attendance.attendanceId}" /></td>
+									<td><c:out value="${attendance.userId}" /></td>
+									<td><c:out value="${attendance.checkInTime}" /></td>
+									<td><c:out value="${attendance.checkOutTime != null ? attendance.checkOutTime : '-'}" /></td>
 									<td>
 										<form action="manager" method="post" style="display:inline;">
-											<input type="hidden" name="action" value="delete_user">
-											<input type="hidden" name="user_id" value="${user.userId}">
+											<input type="hidden" name="action" value="delete_attendance">
+											<input type="hidden" name="attendance_id" value="${attendance.attendanceId}">
 											<input type="submit" value="削除">
 										</form>
-										</td>
+									</td>
 								</tr>
 							</c:forEach>
 						</tbody>
 					</table>
+				</c:when>
+				<c:when test="${page == 'users'}">
+					<h2>ユーザー管理</h2>
 					<div class="form-section">
 						<h3>ユーザー新規作成</h3>
 						<form action="manager" method="post">
@@ -103,32 +94,30 @@
 							<input type="submit" value="作成">
 						</form>
 					</div>
-				</c:when>
-				<c:when test="${param.page == 'messages'}">
-					<h2>連絡/告知事項管理</h2>
+					<h3>ロール管理</h3>
+					<h3>従業員詳細</h3>
+					<h3>従業員一覧</h3>
 					<table>
 						<thead>
 							<tr>
 								<th>ID</th>
-								<th>メッセージ</th>
-								<th>優先度</th>
-								<th>開始日時</th>
-								<th>終了日時</th>
+								<th>ユーザー名</th>
+								<th>ロール</th>
+								<th>有効</th>
 								<th>操作</th>
 							</tr>
 						</thead>
 						<tbody>
-							<c:forEach items="${messages}" var="message">
+							<c:forEach items="${users}" var="user">
 								<tr>
-									<td><c:out value="${message.messageId}" /></td>
-									<td><c:out value="${message.message}" /></td>
-									<td><c:out value="${message.priority}" /></td>
-									<td><c:out value="${message.startDatetime}" /></td>
-									<td><c:out value="${message.endDatetime}" /></td>
+									<td><c:out value="${user.userId}" /></td>
+									<td><c:out value="${user.username}" /></td>
+									<td><c:out value="${user_role.rolename}" /></td>
+									<td><c:out value="${user.enabled ? '有効' : '無効'}" /></td>
 									<td>
 										<form action="manager" method="post" style="display:inline;">
-											<input type="hidden" name="action" value="delete_message">
-											<input type="hidden" name="message_id" value="${message.messageId}">
+											<input type="hidden" name="action" value="delete_user">
+											<input type="hidden" name="user_id" value="${user.userId}">
 											<input type="submit" value="削除">
 										</form>
 										</td>
@@ -136,6 +125,10 @@
 							</c:forEach>
 						</tbody>
 					</table>
+					
+				</c:when>
+				<c:when test="${page == 'messages'}">
+					<h2>連絡/告知事項管理</h2>
 					<div class="form-section">
 						<h3>連絡/告知事項の新規作成</h3>
 						<form action="manager" method="post">
@@ -151,10 +144,42 @@
 							<input type="submit" value="作成">
 						</form>
 					</div>
+					<h3>連絡/告知事項一覧</h3>
+					<table>
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>メッセージ</th>
+								<th>優先度</th>
+								<th>開始日時</th>
+								<th>終了日時</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:forEach items="${messages}" var="message">
+								<tr>
+									<td><c:out value="${message.messageId}" /></td>
+									<td><c:out value="${message.messageText}" /></td>
+									<td><c:out value="${message.priority}" /></td>
+									<td><c:out value="${message.startDatetime}" /></td>
+									<td><c:out value="${message.endDatetime}" /></td>
+									<td>
+										<form action="manager" method="post" style="display:inline;">
+											<input type="hidden" name="action" value="delete_message">
+											<input type="hidden" name="message_id" value="${message.messageId}">
+											<input type="submit" value="削除">
+										</form>
+										</td>
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+					
 				</c:when>
 				<c:otherwise>
 					<h2>ようこそ、管理者様</h2>
-					<p>左のメニューから操作を選択してください。</p>
+					<p>上のメニューから操作を選択してください。</p>
 				</c:otherwise>
 			</c:choose>
 		</div>

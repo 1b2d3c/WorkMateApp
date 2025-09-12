@@ -1,7 +1,6 @@
 package com.example.attendance.dao;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,23 +10,11 @@ import java.util.List;
 
 import com.example.attendance.dto.User;
 
-/**
- * `users` テーブルへのデータベースアクセスを行うDAOクラス。
- */
 public class UserDAO {
-    private static final String URL = "jdbc:postgresql://localhost:5432/workmate_db";
-    private static final String USER = "postgres";
-    private static final String PASSWORD = "postgres";
 
-    /**
-     * 新しいユーザーをデータベースに挿入します。
-     *
-     * @param user 挿入するユーザーオブジェクト
-     * @return 挿入が成功した場合はtrue、失敗した場合はfalse
-     */
     public boolean insertUser(User user) {
-        String sql = "INSERT INTO users (username, password, role, enabled) VALUES (?, ?, ?::user_role_type, ?)";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        String sql = "INSERT INTO users (username, password, role, enabled) VALUES (?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, user.getUsername());
             pstmt.setString(2, user.getPassword());
@@ -41,16 +28,10 @@ public class UserDAO {
         }
     }
 
-    /**
-     * 指定されたIDのユーザーを検索します。
-     *
-     * @param userId 検索するユーザーのID
-     * @return 見つかった場合はUserオブジェクト、見つからなかった場合はnull
-     */
     public User getUserById(int userId) {
         String sql = "SELECT user_id, username, password, role, enabled FROM users WHERE user_id = ?";
         User user = null;
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -70,16 +51,10 @@ public class UserDAO {
         return user;
     }
 
-    /**
-     * 指定されたユーザー名でユーザーを検索します。ログイン処理に使用します。
-     *
-     * @param username 検索するユーザー名
-     * @return 見つかった場合はUserオブジェクト、見つからなかった場合はnull
-     */
     public User getUserByUsername(String username) {
         String sql = "SELECT user_id, username, password, role, enabled FROM users WHERE username = ?";
         User user = null;
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, username);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -99,15 +74,10 @@ public class UserDAO {
         return user;
     }
 
-    /**
-     * すべてのユーザーを取得します。
-     *
-     * @return すべてのユーザーのリスト
-     */
     public List<User> getAllUsers() {
         List<User> userList = new ArrayList<>();
         String sql = "SELECT user_id, username, password, role, enabled FROM users";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DBConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -126,15 +96,9 @@ public class UserDAO {
         return userList;
     }
 
-    /**
-     * ユーザー情報を更新します。
-     *
-     * @param user 更新するユーザーオブジェクト
-     * @return 更新が成功した場合はtrue、失敗した場合はfalse
-     */
     public boolean updateUser(User user) {
-        String sql = "UPDATE users SET username = ?, password = ?, role = ?::user_role_type, enabled = ? WHERE user_id = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        String sql = "UPDATE users SET username = ?, password = ?, role = ?, enabled = ? WHERE user_id = ?";
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, user.getUsername());
             pstmt.setString(2, user.getPassword());
@@ -149,15 +113,9 @@ public class UserDAO {
         }
     }
 
-    /**
-     * 指定されたIDのユーザーを削除します。
-     *
-     * @param userId 削除するユーザーのID
-     * @return 削除が成功した場合はtrue、失敗した場合はfalse
-     */
     public boolean deleteUser(int userId) {
         String sql = "DELETE FROM users WHERE user_id = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
             int affectedRows = pstmt.executeUpdate();

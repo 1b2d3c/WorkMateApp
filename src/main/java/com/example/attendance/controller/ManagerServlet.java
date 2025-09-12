@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.time.format.DateTimeFormatter;
+
 import com.example.attendance.dao.AttendanceDAO;
 import com.example.attendance.dao.MessageDAO;
 import com.example.attendance.dao.UserDAO;
@@ -27,35 +29,40 @@ public class ManagerServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
         if (action == null) {
-            action = "dashboard";
+            action = "dashboard"; // Ensure action is never null
         }
+        String page = "dashboard"; // Default page
 
         switch (action) {
             case "view_attendance":
-                List<User> users = userDAO.getAllUsers();
-                request.setAttribute("users", users);
-                request.getRequestDispatcher("manager/dashboard.jsp?page=attendance").forward(request, response);
+                page = "attendance";
+                List<Attendance> allAttendance = attendanceDAO.getAllAttendance();
+                request.setAttribute("attendanceList", allAttendance);
                 break;
             case "view_users":
+                page = "users";
                 List<User> allUsers = userDAO.getAllUsers();
                 request.setAttribute("users", allUsers);
-                request.getRequestDispatcher("manager/dashboard.jsp?page=users").forward(request, response);
                 break;
             case "view_messages":
+                page = "messages";
                 List<Message> messages = messageDAO.getAllMessages();
                 request.setAttribute("messages", messages);
-                request.getRequestDispatcher("manager/dashboard.jsp?page=messages").forward(request, response);
                 break;
             default:
-                request.getRequestDispatcher("manager/dashboard.jsp").forward(request, response);
+                // If action is unknown, default to dashboard
+                page = "dashboard";
                 break;
         }
+        request.setAttribute("page", page);
+        System.out.println("ManagerServlet: Final page attribute set to: " + page); // Debugging log
+        request.getRequestDispatcher("/jsp/manager.jsp").forward(request, response);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
         if (action == null) {
-            response.sendRedirect("manager");
+            response.sendRedirect(request.getContextPath() + "/manager");
             return;
         }
 
@@ -69,8 +76,7 @@ public class ManagerServlet extends HttpServlet {
                     checkOut = LocalDateTime.parse(request.getParameter("check_out"));
                 }
                 Attendance attendance = new Attendance(0, userId, checkIn, checkOut);
-                attendanceDAO.insertAttendance(attendance);
-                response.sendRedirect("manager?action=view_attendance");
+                response.sendRedirect(request.getContextPath() + "/manager?action=view_attendance");
                 break;
             case "delete_attendance":
                 // 勤怠記録の削除ロジック
@@ -86,8 +92,7 @@ public class ManagerServlet extends HttpServlet {
                 String role = request.getParameter("role");
                 boolean enabled = Boolean.parseBoolean(request.getParameter("enabled"));
                 User newUser = new User(0, username, password, role, enabled);
-                userDAO.insertUser(newUser);
-                response.sendRedirect("manager?action=view_users");
+                response.sendRedirect(request.getContextPath() + "/manager?action=view_users");
                 break;
             case "delete_user":
                 // ユーザー削除ロジック
@@ -99,22 +104,29 @@ public class ManagerServlet extends HttpServlet {
                 // 連絡/告知事項の追加ロジック
                 String messageText = request.getParameter("message_text");
                 String priority = request.getParameter("priority");
-                LocalDateTime start = LocalDateTime.parse(request.getParameter("start_datetime"));
-                LocalDateTime end = LocalDateTime.parse(request.getParameter("end_datetime"));
+                LocalDateTime start = LocalDateTime.parse(request.getParameter("start_datetime"), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+                LocalDateTime end = null;
+                if (request.getParameter("end_datetime") != null && !request.getParameter("end_datetime").isEmpty()) {
+                    end = LocalDateTime.parse(request.getParameter("end_datetime"), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+                }
                 Message newMessage = new Message(0, messageText, priority, start, end);
-                messageDAO.insertMessage(newMessage);
-                response.sendRedirect("manager?action=view_messages");
+                boolean insertSuccess = messageDAO.insertMessage(newMessage);
+                System.out.println("ManagerServlet: messageDAO.insertMessage success: " + insertSuccess); // Debugging log
+                response.sendRedirect(request.getContextPath() + "/manager?action=view_messages");
                 break;
             case "edit_message":
                 // 連絡/告知事項の編集ロジック
                 int messageId = Integer.parseInt(request.getParameter("message_id"));
                 String updatedMessageText = request.getParameter("message_text");
                 String updatedPriority = request.getParameter("priority");
-                LocalDateTime updatedStart = LocalDateTime.parse(request.getParameter("start_datetime"));
-                LocalDateTime updatedEnd = LocalDateTime.parse(request.getParameter("end_datetime"));
+                LocalDateTime updatedStart = LocalDateTime.parse(request.getParameter("start_datetime"), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+                LocalDateTime updatedEnd = null;
+                if (request.getParameter("end_datetime") != null && !request.getParameter("end_datetime").isEmpty()) {
+                    updatedEnd = LocalDateTime.parse(request.getParameter("end_datetime"), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+                }
                 Message updatedMessage = new Message(messageId, updatedMessageText, updatedPriority, updatedStart, updatedEnd);
                 messageDAO.updateMessage(updatedMessage);
-                response.sendRedirect("manager?action=view_messages");
+                response.sendRedirect(request.getContextPath() + "/manager?action=view_messages");
                 break;
             default:
                 response.sendRedirect("manager");
