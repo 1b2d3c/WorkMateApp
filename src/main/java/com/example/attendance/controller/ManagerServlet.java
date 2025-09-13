@@ -74,7 +74,8 @@ public class ManagerServlet extends HttpServlet {
                 if (request.getParameter("check_out") != null && !request.getParameter("check_out").isEmpty()) {
                     checkOut = LocalDateTime.parse(request.getParameter("check_out"));
                 }
-                Attendance attendance = new Attendance(0, userId, checkIn, checkOut);
+                Attendance attendance = new Attendance(userId, checkIn, checkOut);
+                attendanceDAO.insertAttendance(attendance);
                 response.sendRedirect(request.getContextPath() + "/manager?action=view_attendance");
                 break;
             case "delete_attendance":
@@ -90,7 +91,8 @@ public class ManagerServlet extends HttpServlet {
                 String password = request.getParameter("password");
                 String role = request.getParameter("role");
                 boolean enabled = Boolean.parseBoolean(request.getParameter("enabled"));
-                User newUser = new User(0, username, password, role, enabled);
+                User user = new User(username, password, role, enabled);
+                userDAO.insertUser(user);
                 response.sendRedirect(request.getContextPath() + "/manager?action=view_users");
                 break;
             case "delete_user":
@@ -112,6 +114,12 @@ public class ManagerServlet extends HttpServlet {
                 boolean insertSuccess = messageDAO.insertMessage(newMessage);
                 System.out.println("ManagerServlet: messageDAO.insertMessage success: " + insertSuccess); // Debugging log
                 response.sendRedirect(request.getContextPath() + "/manager?action=view_messages");
+                break;
+            case "delete_message":
+                // メッセージ削除ロジック
+                int deleteMessageId = Integer.parseInt(request.getParameter("message_id"));
+                messageDAO.deleteMessage(deleteMessageId);
+                response.sendRedirect("manager?action=view_messages");
                 break;
             case "edit_message":
                 // 連絡/告知事項の編集ロジック
