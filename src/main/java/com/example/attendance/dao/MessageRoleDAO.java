@@ -1,7 +1,6 @@
 package com.example.attendance.dao;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,9 +13,6 @@ import com.example.attendance.dto.MessageRole;
  * `messages_roles` テーブルへのデータベースアクセスを行うDAOクラス。
  */
 public class MessageRoleDAO {
-	private static final String URL = "jdbc:postgresql://localhost:5432/workmate_db";
-    private static final String USER = "postgres";
-    private static final String PASSWORD = "postgres";
 
     /**
      * 新しいメッセージと役割の関連付けをデータベースに挿入します。
@@ -26,7 +22,7 @@ public class MessageRoleDAO {
      */
     public boolean addMessageRole(MessageRole messageRole) {
         String sql = "INSERT INTO messages_roles (message_id, role_id) VALUES (?, ?)";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, messageRole.getMessageId());
             pstmt.setInt(2, messageRole.getRoleId());
@@ -47,7 +43,7 @@ public class MessageRoleDAO {
     public List<MessageRole> getMessageRolesByMessageId(int messageId) {
         List<MessageRole> messageRoleList = new ArrayList<>();
         String sql = "SELECT message_id, role_id FROM messages_roles WHERE message_id = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, messageId);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -74,7 +70,7 @@ public class MessageRoleDAO {
      */
     public boolean deleteMessageRole(int messageId, int roleId) {
         String sql = "DELETE FROM messages_roles WHERE message_id = ? AND role_id = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, messageId);
             pstmt.setInt(2, roleId);

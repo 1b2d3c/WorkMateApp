@@ -1,7 +1,6 @@
 package com.example.attendance.dao;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,13 +14,10 @@ import com.example.attendance.dto.Role;
  * `roles` テーブルへのデータベースアクセスを行うDAOクラス。
  */
 public class RoleDAO {
-	private static final String URL = "jdbc:postgresql://localhost:5432/workmate_db";
-    private static final String USER = "postgres";
-    private static final String PASSWORD = "postgres";
 
     public boolean insertRole(Role role) {
         String sql = "INSERT INTO roles (rolename, rolecategory) VALUES (?, ?::rolecategory)";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, role.getRolename());
             pstmt.setString(2, role.getRolecategory());
@@ -36,7 +32,7 @@ public class RoleDAO {
     public Role getRoleById(int roleId) {
         String sql = "SELECT role_id, rolename, rolecategory FROM roles WHERE role_id = ?";
         Role role = null;
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, roleId);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -57,7 +53,7 @@ public class RoleDAO {
     public List<Role> getAllRoles() {
         List<Role> roleList = new ArrayList<>();
         String sql = "SELECT role_id, rolename, rolecategory FROM roles";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DBConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -76,7 +72,7 @@ public class RoleDAO {
 
     public boolean updateRole(Role role) {
         String sql = "UPDATE roles SET rolename = ?, rolecategory = ?::rolecategory WHERE role_id = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, role.getRolename());
             pstmt.setString(2, role.getRolecategory());
@@ -91,7 +87,7 @@ public class RoleDAO {
 
     public boolean deleteRole(int roleId) {
         String sql = "DELETE FROM roles WHERE role_id = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, roleId);
             int affectedRows = pstmt.executeUpdate();

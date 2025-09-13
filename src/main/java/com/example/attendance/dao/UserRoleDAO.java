@@ -1,7 +1,6 @@
 package com.example.attendance.dao;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,13 +13,10 @@ import com.example.attendance.dto.UserRole;
  * `users_roles` テーブルへのデータベースアクセスを行うDAOクラス。
  */
 public class UserRoleDAO {
-	private static final String URL = "jdbc:postgresql://localhost:5432/workmate_db";
-    private static final String USER = "postgres";
-    private static final String PASSWORD = "postgres";
 
     public boolean addUserRole(UserRole userRole) {
         String sql = "INSERT INTO users_roles (user_id, role_id) VALUES (?, ?)";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, userRole.getUserId());
             pstmt.setInt(2, userRole.getRoleId());
@@ -35,7 +31,7 @@ public class UserRoleDAO {
     public List<UserRole> getUserRolesByUserId(int userId) {
         List<UserRole> userRoleList = new ArrayList<>();
         String sql = "SELECT user_id, role_id FROM users_roles WHERE user_id = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -55,7 +51,7 @@ public class UserRoleDAO {
 
     public boolean deleteUserRole(int userId, int roleId) {
         String sql = "DELETE FROM users_roles WHERE user_id = ? AND role_id = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
             pstmt.setInt(2, roleId);
