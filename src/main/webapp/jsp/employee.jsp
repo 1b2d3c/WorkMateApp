@@ -74,8 +74,7 @@
 							<tr>
 								<td><c:out value="${attendance.checkInTime.toLocalDate()}" /></td>
 								<td><c:out value="${attendance.checkInTime.toLocalTime()}" /></td>
-								<td><c:out
-										value="${attendance.checkOutTime != null ? attendance.checkOutTime.toLocalTime() : '打刻なし'}" /></td>
+								<td><c:out value="${attendance.checkOutTime != null ? attendance.checkOutTime.toLocalTime() : '勤務中'}" /></td>
 							</tr>
 						</c:forEach>
 					</tbody>
