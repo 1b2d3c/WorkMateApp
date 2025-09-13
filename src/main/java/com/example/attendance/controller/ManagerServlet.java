@@ -82,7 +82,7 @@ public class ManagerServlet extends HttpServlet {
                 // 勤怠記録の削除ロジック
                 int attendanceId = Integer.parseInt(request.getParameter("attendance_id"));
                 attendanceDAO.deleteAttendance(attendanceId);
-                response.sendRedirect("manager?action=view_attendance");
+                response.sendRedirect(request.getContextPath() + "manager?action=view_attendance");
                 break;
             case "add_user":
                 // ユーザー新規作成ロジック
@@ -99,7 +99,7 @@ public class ManagerServlet extends HttpServlet {
                 // ユーザー削除ロジック
                 int deleteUserId = Integer.parseInt(request.getParameter("user_id"));
                 userDAO.deleteUser(deleteUserId);
-                response.sendRedirect("manager?action=view_users");
+                response.sendRedirect(request.getContextPath() + "manager?action=view_users");
                 break;
             case "add_message":
                 // 連絡/告知事項の追加ロジック
@@ -119,7 +119,7 @@ public class ManagerServlet extends HttpServlet {
                 // メッセージ削除ロジック
                 int deleteMessageId = Integer.parseInt(request.getParameter("message_id"));
                 messageDAO.deleteMessage(deleteMessageId);
-                response.sendRedirect("manager?action=view_messages");
+                response.sendRedirect(request.getContextPath() + "manager?action=view_messages");
                 break;
             case "edit_message":
                 // 連絡/告知事項の編集ロジック
@@ -136,7 +136,7 @@ public class ManagerServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/manager?action=view_messages");
                 break;
             default:
-                response.sendRedirect("manager");
+                response.sendRedirect(request.getContextPath() + "manager");
                 break;
         }
     }

@@ -29,14 +29,14 @@
 					<h2>勤怠管理</h2>
 					<h3>勤怠履歴の追加/削除</h3>
 					<div class="contentbox">
-						<form action="manager" method="post">
+						<form action="${pageContext.request.contextPath}/manager" method="post">
 							<input type="hidden" name="action" value="add_attendance">
 							<input type="number" name="user_id" placeholder="ユーザーID" required>
 							<input type="datetime-local" name="check_in" required>
 							<input type="datetime-local" name="check_out">
 							<input type="submit" value="追加">
 						</form>
-						<form action="manager" method="post" style="margin-top: 1em;">
+						<form action="${pageContext.request.contextPath}/manager" method="post" style="margin-top: 1em;">
 							<input type="hidden" name="action" value="delete_attendance">
 							<input type="number" name="attendance_id" placeholder="勤怠ID" required>
 							<input type="submit" value="削除">
@@ -47,7 +47,7 @@
 					</div>
 					<h4>詳細勤怠履歴</h4>
 					<div class="contentbox">
-						<form action="manager" method="get">
+						<form action="${pageContext.request.contextPath}/manager" method="get">
 							<input type="hidden" name="action" value="view_attendance">
 							<input type="text" name="user_id" placeholder="ユーザーIDを入力">
 							<input type="submit" value="検索">
@@ -70,7 +70,7 @@
 										<td><c:out value="${attendance.checkInTime}" /></td>
 										<td><c:out value="${attendance.checkOutTime != null ? attendance.checkOutTime : '-'}" /></td>
 										<td>
-											<form action="manager" method="post" style="display:inline;">
+											<form action="${pageContext.request.contextPath}/manager" method="post" style="display:inline;">
 												<input type="hidden" name="action" value="delete_attendance">
 												<input type="hidden" name="attendance_id" value="${attendance.attendanceId}">
 												<input type="submit" value="削除">
@@ -86,7 +86,7 @@
 					<h2>ユーザー管理</h2>
 					<div class="form-section">
 						<h3>ユーザー新規作成</h3>
-						<form action="manager" method="post">
+						<form action="${pageContext.request.contextPath}/manager" method="post">
 							<input type="hidden" name="action" value="add_user">
 							<input type="text" name="username" placeholder="ユーザー名" required>
 							<input type="password" name="password" placeholder="パスワード" required>
@@ -116,10 +116,10 @@
 								<tr>
 									<td><c:out value="${user.userId}" /></td>
 									<td><c:out value="${user.username}" /></td>
-									<td><c:out value="${user_role.rolename}" /></td>
+									<td><c:out value="${user.role}" /></td>
 									<td><c:out value="${user.enabled ? '有効' : '無効'}" /></td>
 									<td>
-										<form action="manager" method="post" style="display:inline;">
+										<form action="${pageContext.request.contextPath}/manager" method="post" style="display:inline;">
 											<input type="hidden" name="action" value="delete_user">
 											<input type="hidden" name="user_id" value="${user.userId}">
 											<input type="submit" value="削除">
@@ -135,7 +135,7 @@
 					<h2>連絡/告知事項管理</h2>
 					<div class="form-section">
 						<h3>連絡/告知事項の新規作成</h3>
-						<form action="manager" method="post">
+						<form action="${pageContext.request.contextPath}/manager" method="post">
 							<input type="hidden" name="action" value="add_message">
 							<textarea name="message_text" placeholder="メッセージ" required></textarea>
 							<select name="priority">
@@ -169,7 +169,7 @@
 									<td><c:out value="${message.startDatetime}" /></td>
 									<td><c:out value="${message.endDatetime}" /></td>
 									<td>
-										<form action="manager" method="post" style="display:inline;">
+										<form action="${pageContext.request.contextPath}/manager" method="post" style="display:inline;">
 											<input type="hidden" name="action" value="delete_message">
 											<input type="hidden" name="message_id" value="${message.messageId}">
 											<input type="submit" value="削除">
