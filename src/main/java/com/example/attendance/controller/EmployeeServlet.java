@@ -26,7 +26,7 @@ public class EmployeeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/index.jsp");
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
         User user = (User) session.getAttribute("user");
@@ -44,7 +44,7 @@ public class EmployeeServlet extends HttpServlet {
         } else if (latestAttendance.getCheckOutTime() != null) {
             status = "退勤済み"; // Last record has check-out time, ready to check in again
         } else {
-            status = "出勤中"; // Last record has no check-out time, currently checked in
+            status = "勤務中"; // Last record has no check-out time, currently checked in
         }
         request.setAttribute("status", status.trim());
         
@@ -60,7 +60,7 @@ public class EmployeeServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/index.jsp");
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
         User user = (User) session.getAttribute("user");

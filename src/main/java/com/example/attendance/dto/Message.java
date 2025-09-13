@@ -12,8 +12,13 @@ public class Message {
     private String priority; // DBのpriorityに対応
     private LocalDateTime startDatetime;
     private LocalDateTime endDatetime;
-
-    public Message() {}
+    
+    public Message(String messageText, String priority, LocalDateTime startDatetime, LocalDateTime endDatetime) {
+        this.messageText = messageText;
+        this.priority = priority;
+        this.startDatetime = startDatetime;
+        this.endDatetime = endDatetime;
+    }
 
     public Message(int messageId, String messageText, String priority, LocalDateTime startDatetime, LocalDateTime endDatetime) {
         this.messageId = messageId;

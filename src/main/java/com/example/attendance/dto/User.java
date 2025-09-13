@@ -10,7 +10,12 @@ public class User {
     private String role; // DBのuser_role_typeに対応
     private boolean enabled;
 
-    public User() {}
+    public User(String username, String password, String role, boolean enabled) {
+    	this.username = username;
+        this.password = password;
+        this.role = role;
+        this.enabled = enabled;
+    }
 
     public User(int userId, String username, String password, String role, boolean enabled) {
         this.userId = userId;

@@ -27,8 +27,8 @@
 			<c:choose>
 				<c:when test="${page == 'attendance'}">
 					<h2>勤怠管理</h2>
-					<div class="form-section">
-						<h3>勤怠履歴の追加/削除</h3>
+					<h3>勤怠履歴の追加/削除</h3>
+					<div class="contentbox">
 						<form action="manager" method="post">
 							<input type="hidden" name="action" value="add_attendance">
 							<input type="number" name="user_id" placeholder="ユーザーID" required>
@@ -43,40 +43,44 @@
 						</form>
 					</div>
 					<h3>従業員全体の勤怠履歴</h3>
+					<div class="contentbox">
+					</div>
 					<h4>詳細勤怠履歴</h4>
-					<form action="manager" method="get">
-						<input type="hidden" name="action" value="view_attendance">
-						<input type="text" name="user_id" placeholder="ユーザーIDを入力">
-						<input type="submit" value="検索">
-					</form>
-					<table>
-						<thead>
-							<tr>
-								<th>ID</th>
-								<th>ユーザーID</th>
-								<th>出勤時刻</th>
-								<th>退勤時刻</th>
-								<th>操作</th>
-							</tr>
-						</thead>
-						<tbody>
-							<c:forEach items="${attendanceList}" var="attendance">
+					<div class="contentbox">
+						<form action="manager" method="get">
+							<input type="hidden" name="action" value="view_attendance">
+							<input type="text" name="user_id" placeholder="ユーザーIDを入力">
+							<input type="submit" value="検索">
+						</form>
+						<table>
+							<thead>
 								<tr>
-									<td><c:out value="${attendance.attendanceId}" /></td>
-									<td><c:out value="${attendance.userId}" /></td>
-									<td><c:out value="${attendance.checkInTime}" /></td>
-									<td><c:out value="${attendance.checkOutTime != null ? attendance.checkOutTime : '-'}" /></td>
-									<td>
-										<form action="manager" method="post" style="display:inline;">
-											<input type="hidden" name="action" value="delete_attendance">
-											<input type="hidden" name="attendance_id" value="${attendance.attendanceId}">
-											<input type="submit" value="削除">
-										</form>
-									</td>
+									<th>ID</th>
+									<th>ユーザーID</th>
+									<th>出勤時刻</th>
+									<th>退勤時刻</th>
+									<th>操作</th>
 								</tr>
-							</c:forEach>
-						</tbody>
-					</table>
+							</thead>
+							<tbody>
+								<c:forEach items="${attendanceList}" var="attendance">
+									<tr>
+										<td><c:out value="${attendance.attendanceId}" /></td>
+										<td><c:out value="${attendance.userId}" /></td>
+										<td><c:out value="${attendance.checkInTime}" /></td>
+										<td><c:out value="${attendance.checkOutTime != null ? attendance.checkOutTime : '-'}" /></td>
+										<td>
+											<form action="manager" method="post" style="display:inline;">
+												<input type="hidden" name="action" value="delete_attendance">
+												<input type="hidden" name="attendance_id" value="${attendance.attendanceId}">
+												<input type="submit" value="削除">
+											</form>
+										</td>
+									</tr>
+								</c:forEach>
+							</tbody>
+						</table>
+					</div>
 				</c:when>
 				<c:when test="${page == 'users'}">
 					<h2>ユーザー管理</h2>

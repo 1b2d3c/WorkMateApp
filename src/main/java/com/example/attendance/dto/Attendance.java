@@ -12,7 +12,11 @@ public class Attendance {
     private LocalDateTime checkInTime;
     private LocalDateTime checkOutTime;
 
-    public Attendance() {}
+    public Attendance(int userId, LocalDateTime checkInTime, LocalDateTime checkOutTime) {
+        this.userId = userId;
+        this.checkInTime = checkInTime;
+        this.checkOutTime = checkOutTime;
+    }
 
     public Attendance(int attendanceId, int userId, LocalDateTime checkInTime, LocalDateTime checkOutTime) {
         this.attendanceId = attendanceId;
