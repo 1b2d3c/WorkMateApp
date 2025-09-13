@@ -31,6 +31,9 @@ public class EmployeeServlet extends HttpServlet {
         }
         User user = (User) session.getAttribute("user");
         
+        // セッションから取得したユーザー名をリクエストスコープにセット
+        request.setAttribute("username", user.getUsername());
+        
         // 自身の勤怠履歴を取得
         List<Attendance> attendanceList = attendanceDAO.getAttendanceByUserId(user.getUserId());
         request.setAttribute("attendanceList", attendanceList);
@@ -40,16 +43,14 @@ public class EmployeeServlet extends HttpServlet {
         String status;
 
         if (latestAttendance == null) {
-            status = "退勤済み"; // No attendance record, ready to check in
+            status = "退勤済み";
         } else if (latestAttendance.getCheckOutTime() != null) {
-            status = "退勤済み"; // Last record has check-out time, ready to check in again
+            status = "退勤済み";
         } else {
-            status = "勤務中"; // Last record has no check-out time, currently checked in
+            status = "勤務中";
         }
         request.setAttribute("status", status.trim());
         
-        // TODO: 自身に付与された連絡事項の表示ロジック
-        // MessageDAO と MessageRoleDAO を使用して実装する必要があります。
         // すべての連絡事項を取得して表示
         List<Message> messages = messageDAO.getAllMessages();
         request.setAttribute("messages", messages);
@@ -69,7 +70,7 @@ public class EmployeeServlet extends HttpServlet {
 
         if ("check_in".equals(action)) {
             // 出勤処理
-            Attendance newAttendance = new Attendance(0, user.getUserId(), LocalDateTime.now(), null);
+            Attendance newAttendance = new Attendance(user.getUserId(), LocalDateTime.now(), null);
             attendanceDAO.insertAttendance(newAttendance);
         } else if ("check_out".equals(action)) {
             // 退勤処理

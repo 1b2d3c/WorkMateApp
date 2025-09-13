@@ -79,13 +79,16 @@ input[type="password"] {
 }
 
 .employeepage header {
-	background-color: #007bff;
+	background-color: #5c95da;
 	color: white;
 	padding: 1em;
 	text-align: center;
 }
 
 .employeepage nav {
+	margin: 0 auto;
+	border-radius: 30px;
+	width: 150px;
 	background-color: #555;
 	padding: 0.5em;
 	text-align: center;

@@ -15,11 +15,11 @@
 </head>
 <body class="employeepage">
 	<header>
-		<h1>従業員ダッシュボード</h1>
+		<h1>従業員 <c:out value="${username}" /> さん</h1>
+		<nav>
+			<a href="${pageContext.request.contextPath}/logout">logout</a>
+		</nav>
 	</header>
-	<nav>
-		<a href="${pageContext.request.contextPath}/logout">ログアウト</a>
-	</nav>
 	<div class="container">
 		<div class="status-box <c:if test="${status eq '勤務中'}">active</c:if><c:if test="${status eq '退勤済み'}">inactive</c:if>">
 			<h3>現在のステータス:<c:out value="${status}" /></h3>
@@ -47,7 +47,7 @@
 								<c:out value="${message.messageText}" />
 							</h3>
 							<p>
-								期間:
+								表示期間:
 								<c:out value="${message.startDatetime}" />
 								-
 								<c:out value="${message.endDatetime}" />
