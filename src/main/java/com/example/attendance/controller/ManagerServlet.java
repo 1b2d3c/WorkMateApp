@@ -38,6 +38,11 @@ public class ManagerServlet extends HttpServlet {
                 List<Attendance> allAttendance = attendanceDAO.getAllAttendance();
                 request.setAttribute("attendanceList", allAttendance);
                 break;
+            case "user_attendance":
+                page = "attendance";
+                List<Attendance> attendanceByUserId = attendanceDAO.getAttendanceByUserId(0);
+                request.setAttribute("attendanceList", attendanceByUserId);
+                break;
             case "view_users":
                 page = "users";
                 List<User> allUsers = userDAO.getAllUsers();

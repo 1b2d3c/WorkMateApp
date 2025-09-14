@@ -14,7 +14,7 @@
 </head>
 <body class="managerpage">
 	<header>
-		<h1>管理者ダッシュボード</h1>
+		<h1>管理者 <c:out value="${username}" /> さん</h1>
 	</header>
 	<nav>
 		<a href="${pageContext.request.contextPath}/manager?action=view_attendance">勤怠管理</a>
@@ -49,11 +49,13 @@
 					</div>
 					<h4>詳細勤怠履歴</h4>
 					<div class="contentbox">
-						<form action="manager" method="get">
-							<input type="hidden" name="action" value="view_attendance">
-							<input type="text" name="user_id" placeholder="ユーザーIDを入力">
-							<input type="submit" value="検索">
-						</form>
+						<div class="form-section">
+							<form action="manager" method="get">
+								<input type="hidden" name="action" value="user_attendance">
+								<input type="text" name="user_id" placeholder="ユーザーIDを入力">
+								<input type="submit" value="検索">
+							</form>
+						</div>
 						<table>
 							<thead>
 								<tr>
