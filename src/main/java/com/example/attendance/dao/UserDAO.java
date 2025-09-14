@@ -134,5 +134,4 @@ public class UserDAO {
         o.setValue(label);    // DB 定義ラベルと完全一致（大文字小文字含む）
         return o;
     }
-    
 }
