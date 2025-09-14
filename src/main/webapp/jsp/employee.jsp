@@ -58,6 +58,7 @@
 			</div>
 			<h2>Status</h2>
 			<div class="contentbox">
+				
 			</div>
 			<h2>Work Records</h2>
 			<div class="contentbox">

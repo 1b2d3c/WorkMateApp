@@ -8,6 +8,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.postgresql.util.PGobject;
+
 import com.example.attendance.dto.User;
 
 public class UserDAO {
@@ -18,7 +20,7 @@ public class UserDAO {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, user.getUsername());
             pstmt.setString(2, user.getPassword());
-            pstmt.setString(3, user.getRole());
+            pstmt.setObject(3, pgEnum("role", user.getRole()));
             pstmt.setBoolean(4, user.isEnabled());
             int affectedRows = pstmt.executeUpdate();
             return affectedRows > 0;
@@ -102,7 +104,7 @@ public class UserDAO {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, user.getUsername());
             pstmt.setString(2, user.getPassword());
-            pstmt.setString(3, user.getRole());
+            pstmt.setObject(3, pgEnum("role", user.getRole()));
             pstmt.setBoolean(4, user.isEnabled());
             pstmt.setInt(5, user.getUserId());
             int affectedRows = pstmt.executeUpdate();
@@ -124,5 +126,12 @@ public class UserDAO {
             e.printStackTrace();
             return false;
         }
+    }
+    
+    private static PGobject pgEnum(String enumType, String label) throws SQLException {
+        PGobject o = new PGobject();
+        o.setType(enumType);  // 例: "priority"
+        o.setValue(label);    // DB 定義ラベルと完全一致（大文字小文字含む）
+        return o;
     }
 }
