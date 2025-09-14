@@ -3,6 +3,7 @@ package com.example.attendance.controller;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.servlet.ServletException;
@@ -39,9 +40,27 @@ public class ManagerServlet extends HttpServlet {
                 request.setAttribute("attendanceList", allAttendance);
                 break;
             case "user_attendance":
+                String userIdParam = request.getParameter("user_id");
+                List<Attendance> attendanceList;
+
+                if (userIdParam == null || userIdParam.isEmpty()) {
+                    // 検索欄が空の場合は、全ての勤怠履歴を取得
+                    attendanceList = attendanceDAO.getAllAttendance();
+                } else {
+                    // ユーザーIDが入力された場合は、そのIDの勤怠履歴を取得
+                    try {
+                        int userId = Integer.parseInt(userIdParam);
+                        attendanceList = attendanceDAO.getAttendanceByUserId(userId);
+                    } catch (NumberFormatException e) {
+                        // 無効なIDが入力された場合
+                        System.err.println("Invalid user ID format: " + userIdParam);
+                        attendanceList = new ArrayList<>(); // 空のリストを返す
+                        request.setAttribute("errorMessage", "無効なユーザーIDです。");
+                    }
+                }
+
+                request.setAttribute("attendanceList", attendanceList);
                 page = "attendance";
-                List<Attendance> attendanceByUserId = attendanceDAO.getAttendanceByUserId(0);
-                request.setAttribute("attendanceList", attendanceByUserId);
                 break;
             case "view_users":
                 page = "users";
