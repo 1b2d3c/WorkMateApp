@@ -22,98 +22,103 @@ import com.example.attendance.dto.User;
 
 @WebServlet("/employee")
 public class EmployeeServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
-    private final AttendanceDAO attendanceDAO = new AttendanceDAO();
-    private final MessageDAO messageDAO = new MessageDAO();
+	private static final long serialVersionUID = 1L;
+	private final AttendanceDAO attendanceDAO = new AttendanceDAO();
+	private final MessageDAO messageDAO = new MessageDAO();
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
-            return;
-        }
-        User user = (User) session.getAttribute("user");
-        
-        // セッションから取得したユーザー名をリクエストスコープにセット
-        request.setAttribute("username", user.getUsername());
-        
-        // 自身の勤怠履歴を取得
-        List<Attendance> attendanceList = attendanceDAO.getAttendanceByUserId(user.getUserId());
-        request.setAttribute("attendanceList", attendanceList);
-        
-        // 現在の打刻状態を取得
-        Attendance latestAttendance = attendanceDAO.getLatestAttendanceByUserId(user.getUserId());
-        String status;
+	// ユーザーの有効性をチェックするヘルパーメソッド
+	private boolean isUserEnabled(User user, HttpServletRequest request) {
+		if (user != null && !user.isEnabled()) {
+			request.setAttribute("disabledMessage", "アカウントが無効化されています。勤怠打刻などの機能は利用できません。");
+			return false;
+		}
+		return true;
+	}
 
-        if (latestAttendance == null) {
-            status = "退勤済み";
-        } else if (latestAttendance.getCheckOutTime() != null) {
-            status = "退勤済み";
-        } else {
-            status = "勤務中";
-        }
-        request.setAttribute("status", status.trim());
-        
-        // すべての連絡事項を取得して表示
-        List<Message> allMessages = messageDAO.getAllMessages();
-        
-        LocalDateTime now = LocalDateTime.now();
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession(false);
+		if (session == null || session.getAttribute("user") == null) {
+			response.sendRedirect(request.getContextPath() + "/login.jsp");
+			return;
+		}
+		
+		User user = (User) session.getAttribute("user");
+		request.setAttribute("username", user.getUsername());
+
+		// ユーザーが無効な場合、表示を制限
+		boolean enabled = isUserEnabled(user, request);
+
+		String status = "退勤済み";
+		// 有効なユーザーのみ勤怠ステータスを更新
+		if (enabled) {
+			Attendance currentAttendance = attendanceDAO.getLatestAttendanceByUserId(user.getUserId());
+			if (currentAttendance != null && currentAttendance.getCheckOutTime() == null) {
+				status = "勤務中";
+			}
+		}
+		request.setAttribute("status", status);
+		
+		List<Message> allMessages = messageDAO.getAllMessages();
+		LocalDateTime now = LocalDateTime.now();
 		List<Message> filteredMessages = allMessages.stream()
-		    .filter(m -> !now.isBefore(m.getStartDatetime()) && !now.isAfter(m.getEndDatetime()))
-		    .collect(Collectors.toList());
-        
-        Collections.sort(filteredMessages, new Comparator<Message>() {
-		    @Override
-		    public int compare(Message m1, Message m2) {
-		        int p1 = getPriorityValue(m1.getPriority());
-		        int p2 = getPriorityValue(m2.getPriority());
-		        // 降順ソート
-		        return Integer.compare(p2, p1);
-		    }
-
-		    private int getPriorityValue(String priority) {
-		        switch (priority) {
-		            case "high": return 3;
-		            case "normal": return 2;
-		            case "low": return 1;
-		            default: return 0;
-		        }
-		    }
+				.filter(m -> !now.isBefore(m.getStartDatetime()) && !now.isAfter(m.getEndDatetime()))
+				.collect(Collectors.toList());
+		
+		Collections.sort(filteredMessages, new Comparator<Message>() {
+			@Override
+			public int compare(Message m1, Message m2) {
+				int p1 = getPriorityValue(m1.getPriority());
+				int p2 = getPriorityValue(m2.getPriority());
+				return Integer.compare(p2, p1);
+			}
+			private int getPriorityValue(String priority) {
+				switch (priority) {
+					case "high": return 3;
+					case "normal": return 2;
+					case "low": return 1;
+					default: return 0;
+				}
+			}
 		});
-        request.setAttribute("messages", filteredMessages);
+		
+		request.setAttribute("messages", filteredMessages);
 
-        request.getRequestDispatcher("/jsp/employee.jsp").forward(request, response);
-    }
+		// 有効なユーザーのみ勤怠記録を表示
+		if (enabled) {
+			request.setAttribute("attendanceList", attendanceDAO.getAttendanceByUserId(user.getUserId()));
+		} else {
+			request.setAttribute("attendanceList", Collections.emptyList());
+		}
+		
+		request.getRequestDispatcher("/jsp/employee.jsp").forward(request, response);
+	}
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
-            return;
-        }
-        User user = (User) session.getAttribute("user");
-        
-        String action = request.getParameter("action");
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession(false);
+		if (session == null || session.getAttribute("user") == null) {
+			response.sendRedirect(request.getContextPath() + "/login.jsp");
+			return;
+		}
 
-        if ("check_in".equals(action)) {
-            // 出勤処理
-            Attendance newAttendance = new Attendance(user.getUserId(), LocalDateTime.now(), null);
-            attendanceDAO.insertAttendance(newAttendance);
-        } else if ("check_out".equals(action)) {
-            // 退勤処理
-            System.out.println("EmployeeServlet: Processing check_out action."); // Debugging log
-            Attendance latestAttendance = attendanceDAO.getLatestAttendanceByUserId(user.getUserId());
-            System.out.println("EmployeeServlet: latestAttendance for check_out: " + latestAttendance); // Debugging log
+		User user = (User) session.getAttribute("user");
+		String action = request.getParameter("action");
+		
+		// 無効なユーザーは勤怠打刻操作をスキップ
+		if (!user.isEnabled()) {
+			response.sendRedirect(request.getContextPath() + "/employee");
+			return;
+		}
 
-            if (latestAttendance != null && latestAttendance.getCheckOutTime() == null) {
-                latestAttendance.setCheckOutTime(LocalDateTime.now());
-                System.out.println("EmployeeServlet: Attempting to update attendanceId: " + latestAttendance.getAttendanceId() + " with checkOutTime: " + latestAttendance.getCheckOutTime()); // Debugging log
-                boolean updateSuccess = attendanceDAO.updateAttendance(latestAttendance);
-                System.out.println("EmployeeServlet: updateAttendance success: " + updateSuccess); // Debugging log
-            } else {
-                System.out.println("EmployeeServlet: Check-out condition not met. latestAttendance: " + latestAttendance + ", checkOutTime: " + (latestAttendance != null ? latestAttendance.getCheckOutTime() : "null")); // Debugging log
-            }
-        }
-        response.sendRedirect(request.getContextPath() + "/employee");
-    }
+		if ("check_in".equals(action)) {
+			Attendance attendance = new Attendance(user.getUserId(), LocalDateTime.now(), null);
+			attendanceDAO.insertAttendance(attendance);
+		} else if ("check_out".equals(action)) {
+			Attendance latestAttendance = attendanceDAO.getLatestAttendanceByUserId(user.getUserId());
+			if (latestAttendance != null && latestAttendance.getCheckOutTime() == null) {
+				latestAttendance.setCheckOutTime(LocalDateTime.now());
+				attendanceDAO.updateAttendance(latestAttendance);
+			}
+		}
+		response.sendRedirect(request.getContextPath() + "/employee");
+	}
 }

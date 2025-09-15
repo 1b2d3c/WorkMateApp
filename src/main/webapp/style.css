@@ -221,6 +221,10 @@ input[type="password"] {
 	text-decoration: none;
 }
 
+.managerpage .disabled-message {
+	text-align: center;
+}
+
 .managerpage .container {
 	padding: 2em;
 }

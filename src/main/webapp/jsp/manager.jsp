@@ -11,6 +11,11 @@
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c&family=Yusei+Magic&display=swap" rel="stylesheet">
 <title>管理者ダッシュボード</title>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/style.css">
+<script>
+    function submitUpdateForm(userId) {
+        document.getElementById('updateUserForm_' + userId).submit();
+    }
+</script>
 </head>
 <body class="managerpage">
 	<header>
@@ -22,6 +27,11 @@
 		<a href="${pageContext.request.contextPath}/manager?action=view_messages">連絡事項管理</a>
 		<a href="${pageContext.request.contextPath}/logout">ログアウト</a>
 	</nav>
+	<c:if test="${not empty disabledMessage}">
+        <div class="disabled-message">
+            <p><c:out value="${disabledMessage}"/></p>
+        </div>
+    </c:if>
 	<div class="container">
 		<div class="content">
 			<c:choose>
@@ -172,7 +182,7 @@
                                         <form id="updateUserForm_<c:out value="${user.userId}"/>" action="manager" method="post">
                                             <input type="hidden" name="action" value="update_user_enabled">
                                             <input type="hidden" name="user_id" value="<c:out value="${user.userId}"/>">
-                                            <select name="enabled" onchange="submitUpdateForm(<c:out value="${user.userId}"/>)">
+                                            <select name="enabled" onchange="submitUpdateForm(<c:out value="${user.userId}"/>)" <c:if test="${not empty disabledMessage}">disabled</c:if>>
                                                 <option value="true" <c:if test="${user.enabled}">selected</c:if>>有効</option>
                                                 <option value="false" <c:if test="${!user.enabled}">selected</c:if>>無効</option>
                                             </select>

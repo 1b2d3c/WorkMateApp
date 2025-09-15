@@ -255,6 +255,20 @@ public class UserDAO {
             return false;
         }
     }
+    
+    public boolean updateUserEnabled(int userId, boolean enabled) {
+        String sql = "UPDATE users SET enabled = ? WHERE user_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setBoolean(1, enabled);
+            pstmt.setInt(2, userId);
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
     // --- helpers: フォールバック取得（簡潔版） ---
     private User fetchUserWithFallback(String sql, int userId) {

@@ -32,6 +32,22 @@ public class ManagerServlet extends HttpServlet {
     private final AttendanceDAO attendanceDAO = new AttendanceDAO();
     private final MessageDAO messageDAO = new MessageDAO();
     private final RoleDAO roleDAO = new RoleDAO();
+    
+    private boolean isUserEnabled(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		HttpSession session = request.getSession(false);
+		if (session == null || session.getAttribute("user") == null) {
+			response.sendRedirect(request.getContextPath() + "/login.jsp");
+			return false;
+		}
+
+		User user = (User) session.getAttribute("user");
+		if (!user.isEnabled()) {
+			session.invalidate();
+			response.sendRedirect(request.getContextPath() + "/login.jsp?error=account_disabled");
+			return false;
+		}
+		return true;
+	}
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	HttpSession session = request.getSession(false);
@@ -40,9 +56,11 @@ public class ManagerServlet extends HttpServlet {
             return;
         }
         User user = (User) session.getAttribute("user");
-        
-        // セッションから取得したユーザー名をリクエストスコープにセット
         request.setAttribute("username", user.getUsername());
+        
+        if (!user.isEnabled()) {
+            request.setAttribute("disabledMessage", "無効なアカウントでログイン中です。データの追加・削除・更新操作はできません。");
+        }
         
         String action = request.getParameter("action");
         if (action == null) {
@@ -171,6 +189,20 @@ public class ManagerServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+
+        User user = (User) session.getAttribute("user");
+        
+        // 無効なユーザーはPOSTリクエストをすべて拒否
+        if (!user.isEnabled()) {
+            response.sendRedirect(request.getContextPath() + "/manager?error=permission_denied");
+            return;
+        }
+    	
         String action = request.getParameter("action");
         if (action == null) {
             response.sendRedirect(request.getContextPath() + "/manager");
@@ -203,14 +235,24 @@ public class ManagerServlet extends HttpServlet {
                 String password = request.getParameter("password");
                 String role = request.getParameter("role");
                 boolean enabled = Boolean.parseBoolean(request.getParameter("enabled"));
-                User user = new User(username, password, role, enabled);
-                userDAO.insertUser(user);
+                User newUser = new User(username, password, role, enabled);
+                userDAO.insertUser(newUser);
                 response.sendRedirect(request.getContextPath() + "/manager?action=view_users");
                 break;
             case "delete_user":
                 // ユーザー削除ロジック
                 int deleteUserId = Integer.parseInt(request.getParameter("user_id"));
                 userDAO.deleteUser(deleteUserId);
+                response.sendRedirect(request.getContextPath() + "/manager?action=view_users");
+                break;
+            case "update_user_enabled":
+                try {
+                    int updateUserId = Integer.parseInt(request.getParameter("user_id"));
+                    boolean updateEnabled = Boolean.parseBoolean(request.getParameter("enabled"));
+                    userDAO.updateUserEnabled(updateUserId, updateEnabled);
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid user ID or enabled value format.");
+                }
                 response.sendRedirect(request.getContextPath() + "/manager?action=view_users");
                 break;
             case "add_message":
