@@ -26,15 +26,6 @@ public class EmployeeServlet extends HttpServlet {
 	private final AttendanceDAO attendanceDAO = new AttendanceDAO();
 	private final MessageDAO messageDAO = new MessageDAO();
 
-	// ユーザーの有効性をチェックするヘルパーメソッド
-	private boolean isUserEnabled(User user, HttpServletRequest request) {
-		if (user != null && !user.isEnabled()) {
-			request.setAttribute("disabledMessage", "アカウントが無効化されています。勤怠打刻などの機能は利用できません。");
-			return false;
-		}
-		return true;
-	}
-
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession(false);
 		if (session == null || session.getAttribute("user") == null) {
@@ -45,11 +36,11 @@ public class EmployeeServlet extends HttpServlet {
 		User user = (User) session.getAttribute("user");
 		request.setAttribute("username", user.getUsername());
 
-		// ユーザーが無効な場合、表示を制限
-		boolean enabled = isUserEnabled(user, request);
+		boolean enabled = user.isEnabled();
+		request.setAttribute("enabled", enabled);
 
 		String status = "退勤済み";
-		// 有効なユーザーのみ勤怠ステータスを更新
+		// 有効なユーザーのみ勤怠ステータスを取得
 		if (enabled) {
 			Attendance currentAttendance = attendanceDAO.getLatestAttendanceByUserId(user.getUserId());
 			if (currentAttendance != null && currentAttendance.getCheckOutTime() == null) {
@@ -83,12 +74,7 @@ public class EmployeeServlet extends HttpServlet {
 		
 		request.setAttribute("messages", filteredMessages);
 
-		// 有効なユーザーのみ勤怠記録を表示
-		if (enabled) {
-			request.setAttribute("attendanceList", attendanceDAO.getAttendanceByUserId(user.getUserId()));
-		} else {
-			request.setAttribute("attendanceList", Collections.emptyList());
-		}
+		request.setAttribute("attendanceList", attendanceDAO.getAttendanceByUserId(user.getUserId()));
 		
 		request.getRequestDispatcher("/jsp/employee.jsp").forward(request, response);
 	}

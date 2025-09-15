@@ -20,20 +20,27 @@
 			<a href="${pageContext.request.contextPath}/logout">logout</a>
 		</nav>
 	</header>
-	<div class="container">
-		<div class="status-box <c:if test="${status eq '勤務中'}">active</c:if><c:if test="${status eq '退勤済み'}">inactive</c:if>">
-			<h3>現在のステータス:<c:out value="${status}" /></h3>
-			<form action="${pageContext.request.contextPath}/employee" method="post">
-				<c:if test="${status eq '退勤済み'}">
-					<input type="hidden" name="action" value="check_in">
-					<button type="submit" class="action-button check-in">出勤</button>
-				</c:if>
-				<c:if test="${status eq '勤務中'}">
-					<input type="hidden" name="action" value="check_out">
-					<button type="submit" class="action-button check-out">退勤</button>
-				</c:if>
-			</form>
+	<c:if test="${!enabled}">
+		<div class="disabled-message">
+			<p>無効なアカウントでログインしています。勤怠操作はできません。</p>
 		</div>
+	</c:if>
+	<div class="container">
+		<c:if test="${enabled}">
+			<div class="status-box <c:if test="${status eq '勤務中'}">active</c:if><c:if test="${status eq '退勤済み'}">inactive</c:if>">
+				<h3>現在のステータス:<c:out value="${status}" /></h3>
+				<form action="${pageContext.request.contextPath}/employee" method="post">
+					<c:if test="${status eq '退勤済み'}">
+						<input type="hidden" name="action" value="check_in">
+						<button type="submit" class="action-button check-in">出勤</button>
+					</c:if>
+					<c:if test="${status eq '勤務中'}">
+						<input type="hidden" name="action" value="check_out">
+						<button type="submit" class="action-button check-out">退勤</button>
+					</c:if>
+				</form>
+			</div>
+		</c:if>
 
 		<div class="content">
 			<h2>Messages</h2>

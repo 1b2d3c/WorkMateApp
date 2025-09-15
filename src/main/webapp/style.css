@@ -100,6 +100,10 @@ input[type="password"] {
 	text-decoration: none;
 }
 
+.employeepage .disabled-message {
+	text-align: center;
+}
+
 .employeepage .container {
 	padding: 2em;
 }
