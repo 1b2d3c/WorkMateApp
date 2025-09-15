@@ -209,6 +209,14 @@
 						</form>
 					</div>
 					<h3>連絡/告知事項一覧</h3>
+					<form action="manager" method="get">
+                        <input type="hidden" name="action" value="view_messages">
+                        <select name="filter" onchange="this.form.submit()">
+                            <option value="all" <c:if test="${param.filter == 'all' || param.filter == null}">selected</c:if>>すべて</option>
+                            <option value="active" <c:if test="${param.filter == 'active'}">selected</c:if>>表示期間内</option>
+                            <option value="inactive" <c:if test="${param.filter == 'inactive'}">selected</c:if>>表示期間外</option>
+                        </select>
+                    </form>
 					<table>
 						<thead>
 							<tr>

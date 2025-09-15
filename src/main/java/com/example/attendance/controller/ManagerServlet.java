@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -83,8 +86,42 @@ public class ManagerServlet extends HttpServlet {
                 break;
             case "view_messages":
                 page = "messages";
-                List<Message> messages = messageDAO.getAllMessages();
-                request.setAttribute("messages", messages);
+                List<Message> allMessages = messageDAO.getAllMessages();
+                String filter = request.getParameter("filter");
+                
+                List<Message> filteredMessages;
+                LocalDateTime now = LocalDateTime.now();
+                
+                if ("active".equals(filter)) {
+                    filteredMessages = allMessages.stream()
+                        .filter(m -> !now.isBefore(m.getStartDatetime()) && !now.isAfter(m.getEndDatetime()))
+                        .collect(Collectors.toList());
+                } else if ("inactive".equals(filter)) {
+                    filteredMessages = allMessages.stream()
+                        .filter(m -> now.isBefore(m.getStartDatetime()) || now.isAfter(m.getEndDatetime()))
+                        .collect(Collectors.toList());
+                } else {
+                    filteredMessages = allMessages; // "all" または null の場合
+                }
+                
+                Collections.sort(filteredMessages, new Comparator<Message>() {
+                    @Override
+                    public int compare(Message m1, Message m2) {
+                        int p1 = getPriorityValue(m1.getPriority());
+                        int p2 = getPriorityValue(m2.getPriority());
+                        return Integer.compare(p2, p1);
+                    }
+
+                    private int getPriorityValue(String priority) {
+                        switch (priority) {
+                            case "high": return 3;
+                            case "normal": return 2;
+                            case "low": return 1;
+                            default: return 0;
+                        }
+                    }
+                });
+                request.setAttribute("messages", filteredMessages);
                 break;
             default:
                 // If action is unknown, default to dashboard
