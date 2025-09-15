@@ -9,7 +9,10 @@ public class Role {
     private String rolename;
     private String rolecategory; // DBのrolecategoryに対応
 
-    public Role() {}
+    public Role(String rolename, String rolecategory) {
+    	this.rolename = rolename;
+        this.rolecategory = rolecategory;
+    }
 
     public Role(int roleId, String rolename, String rolecategory) {
         this.roleId = roleId;

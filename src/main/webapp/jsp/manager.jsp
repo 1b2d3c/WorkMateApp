@@ -103,6 +103,50 @@
 						</form>
 					</div>
 					<h3>ロール管理</h3>
+					<div class="contentbox">
+						<h4>ロール新規追加</h4>
+						<div class="form-section">
+							<form action="manager" method="post">
+								<input type="hidden" name="action" value="add_role">
+								<input type="text" name="rolename" placeholder="ロール名 (例: 営業部)" required>
+								<select name="rolecategory">
+									<option value="original">original</option>
+									<option value="department">department</option>
+									<option value="position">position</option>
+									<option value="qualification">qualification</option>
+								</select>
+								<input type="submit" value="追加">
+							</form>
+						</div>
+
+						<h4>ロール一覧</h4>
+						<table>
+							<thead>
+								<tr>
+									<th>ID</th>
+									<th>ロール名</th>
+									<th>カテゴリ</th>
+									<th>操作</th>
+								</tr>
+							</thead>
+							<tbody>
+								<c:forEach items="${roles}" var="role">
+									<tr>
+										<td><c:out value="${role.roleId}" /></td>
+										<td><a href="manager?action=role_users&role_id=${role.roleId}"><c:out value="${role.rolename}" /></a></td>
+										<td><c:out value="${role.rolecategory}" /></td>
+										<td>
+											<form action="manager" method="post" style="display:inline;">
+												<input type="hidden" name="action" value="delete_role">
+												<input type="hidden" name="role_id" value="${role.roleId}">
+												<input type="submit" value="削除">
+											</form>
+										</td>
+									</tr>
+								</c:forEach>
+							</tbody>
+						</table>
+					</div>
 					<h3>従業員詳細</h3>
 					<h3>従業員一覧</h3>
 					<table>

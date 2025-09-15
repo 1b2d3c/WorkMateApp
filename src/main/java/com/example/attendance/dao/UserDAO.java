@@ -312,6 +312,27 @@ public class UserDAO {
         } catch (SQLException ignore) {}
         return list;
     }
+    
+    public List<User> getUsersByRoleId(int roleId) throws SQLException {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT u.* FROM users u JOIN users_roles ur ON u.user_id = ur.user_id WHERE ur.role_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, roleId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    User user = new User();
+                    user.setUserId(rs.getInt("user_id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setPassword(rs.getString("password"));
+                    user.setRole(rs.getString("role")); // または必要に応じて `user_role_type` を処理
+                    user.setEnabled(rs.getBoolean("enabled"));
+                    users.add(user);
+                }
+            }
+        }
+        return users;
+    }
 
     private static PGobject pgEnum(String enumType, String label) throws SQLException {
         PGobject o = new PGobject();

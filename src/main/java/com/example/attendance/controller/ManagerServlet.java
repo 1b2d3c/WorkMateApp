@@ -15,9 +15,11 @@ import jakarta.servlet.http.HttpSession;
 
 import com.example.attendance.dao.AttendanceDAO;
 import com.example.attendance.dao.MessageDAO;
+import com.example.attendance.dao.RoleDAO;
 import com.example.attendance.dao.UserDAO;
 import com.example.attendance.dto.Attendance;
 import com.example.attendance.dto.Message;
+import com.example.attendance.dto.Role;
 import com.example.attendance.dto.User;
 
 @WebServlet("/manager")
@@ -26,6 +28,7 @@ public class ManagerServlet extends HttpServlet {
     private final UserDAO userDAO = new UserDAO();
     private final AttendanceDAO attendanceDAO = new AttendanceDAO();
     private final MessageDAO messageDAO = new MessageDAO();
+    private final RoleDAO roleDAO = new RoleDAO();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	HttpSession session = request.getSession(false);
@@ -86,6 +89,43 @@ public class ManagerServlet extends HttpServlet {
             default:
                 // If action is unknown, default to dashboard
                 page = "dashboard";
+                break;
+            case "view_roles": // 追加：ロール一覧表示
+                page = "roles";
+                try {
+                    List<Role> allRoles = roleDAO.getAllRoles();
+                    request.setAttribute("roles", allRoles);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    request.setAttribute("errorMessage", "ロール情報の取得中にエラーが発生しました。");
+                }
+                break;
+            case "role_users": // 追加：ロールごとのユーザー一覧表示
+                page = "users";
+                String roleIdParam = request.getParameter("role_id");
+                List<User> users;
+                
+                if (roleIdParam == null || roleIdParam.isEmpty()) {
+                    // ロールIDが空の場合は全てのユーザーを取得
+                    users = userDAO.getAllUsers();
+                } else {
+                    try {
+                        int roleId = Integer.parseInt(roleIdParam);
+                        // UserDAOにロールIDでユーザーを取得するメソッドが必要
+                        // userDAO.getUsersByRoleId(roleId) のようなメソッドを仮定
+                        // ユーザーの役割情報を取得するロジックが未実装のため、一旦全ユーザーを取得して絞り込み
+                        users = userDAO.getUsersByRoleId(roleId);
+                    } catch (NumberFormatException e) {
+                        System.err.println("Invalid role ID format: " + roleIdParam);
+                        users = userDAO.getAllUsers(); // 無効な場合は全ユーザーを表示
+                        request.setAttribute("errorMessage", "無効なロールIDです。全てのユーザーを表示します。");
+                    } catch (Exception e) {
+                    	e.printStackTrace();
+                    	users = userDAO.getAllUsers();
+                    	request.setAttribute("errorMessage", "ユーザー情報の取得中にエラーが発生しました。全てのユーザーを表示します。");
+                    }
+                }
+                request.setAttribute("users", users);
                 break;
         }
         request.setAttribute("page", page);
@@ -169,6 +209,31 @@ public class ManagerServlet extends HttpServlet {
                 Message updatedMessage = new Message(messageId, updatedMessageText, updatedPriority, updatedStart, updatedEnd);
                 messageDAO.updateMessage(updatedMessage);
                 response.sendRedirect(request.getContextPath() + "/manager?action=view_messages");
+                break;
+            case "add_role": // 追加：ロール追加
+                String rolename = request.getParameter("rolename");
+                String rolecategory = request.getParameter("rolecategory");
+                Role newRole = new Role(rolename, rolecategory);
+                try {
+                    roleDAO.insertRole(newRole);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    request.setAttribute("errorMessage", "ロールの追加に失敗しました。");
+                }
+                response.sendRedirect(request.getContextPath() + "/manager?action=view_roles");
+                break;
+            case "delete_role": // 追加：ロール削除
+                try {
+                    int deleteRoleId = Integer.parseInt(request.getParameter("role_id"));
+                    roleDAO.deleteRole(deleteRoleId);
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid role ID format: " + request.getParameter("role_id"));
+                    request.setAttribute("errorMessage", "無効なロールIDです。");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    request.setAttribute("errorMessage", "ロールの削除に失敗しました。");
+                }
+                response.sendRedirect(request.getContextPath() + "/manager?action=view_roles");
                 break;
             default:
                 response.sendRedirect(request.getContextPath() + "/manager");

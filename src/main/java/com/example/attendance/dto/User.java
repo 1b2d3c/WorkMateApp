@@ -25,7 +25,11 @@ public class User {
         this.enabled = enabled;
     }
 
-    // Getters and Setters
+    public User() {
+		// TODO 自動生成されたコンストラクター・スタブ
+	}
+
+	// Getters and Setters
     public int getUserId() {
         return userId;
     }
