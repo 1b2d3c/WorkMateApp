@@ -158,6 +158,10 @@ input[type="password"] {
 	border-bottom: 2px solid #5c95da;
 }
 
+.employeepage .message-item .message-period {
+	color: #999999;
+}
+
 .employeepage .message-item:last-child {
 	border-bottom: none;
 }

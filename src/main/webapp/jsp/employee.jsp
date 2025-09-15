@@ -42,11 +42,16 @@
 					<c:forEach items="${messages}" var="message">
 						<div class="message-item">
 							<h3>
-								<c:out value="${message.priority}" />
+								<c:choose>
+									<c:when test="${message.priority == 'high'}">高</c:when>
+									<c:when test="${message.priority == 'normal'}">中</c:when>
+									<c:when test="${message.priority == 'low'}">低</c:when>
+									<c:otherwise>不明</c:otherwise>
+								</c:choose>
 								:
 								<c:out value="${message.messageText}" />
 							</h3>
-							<p>
+							<p class="message-period">
 								表示期間:
 								<c:out value="${message.startDatetime}" />
 								-

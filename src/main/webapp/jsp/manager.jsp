@@ -104,7 +104,6 @@
 					</div>
 					<h3>ロール管理</h3>
 					<div class="contentbox">
-						<h4>ロール新規追加</h4>
 						<div class="form-section">
 							<form action="manager" method="post">
 								<input type="hidden" name="action" value="add_role">
@@ -118,8 +117,6 @@
 								<input type="submit" value="追加">
 							</form>
 						</div>
-
-						<h4>ロール一覧</h4>
 						<table>
 							<thead>
 								<tr>
@@ -164,8 +161,23 @@
 								<tr>
 									<td><c:out value="${user.userId}" /></td>
 									<td><c:out value="${user.username}" /></td>
-									<td><c:out value="${user.role}" /></td>
-									<td><c:out value="${user.enabled ? '有効' : '無効'}" /></td>
+									<td>
+                                        <c:choose>
+                                            <c:when test="${user.role == 'employee'}">従業員</c:when>
+                                            <c:when test="${user.role == 'manager'}">管理者</c:when>
+                                            <c:otherwise>不明</c:otherwise>
+                                        </c:choose>
+                                    </td>
+									<td>
+                                        <form id="updateUserForm_<c:out value="${user.userId}"/>" action="manager" method="post">
+                                            <input type="hidden" name="action" value="update_user_enabled">
+                                            <input type="hidden" name="user_id" value="<c:out value="${user.userId}"/>">
+                                            <select name="enabled" onchange="submitUpdateForm(<c:out value="${user.userId}"/>)">
+                                                <option value="true" <c:if test="${user.enabled}">selected</c:if>>有効</option>
+                                                <option value="false" <c:if test="${!user.enabled}">selected</c:if>>無効</option>
+                                            </select>
+                                        </form>
+                                    </td>
 									<td>
 										<form action="manager" method="post" style="display:inline;">
 											<input type="hidden" name="action" value="delete_user">
@@ -213,7 +225,14 @@
 								<tr>
 									<td><c:out value="${message.messageId}" /></td>
 									<td><c:out value="${message.messageText}" /></td>
-									<td><c:out value="${message.priority}" /></td>
+									<td>
+                                        <c:choose>
+                                            <c:when test="${message.priority == 'high'}">高</c:when>
+                                            <c:when test="${message.priority == 'normal'}">中</c:when>
+                                            <c:when test="${message.priority == 'low'}">低</c:when>
+                                            <c:otherwise>不明</c:otherwise>
+                                        </c:choose>
+                                    </td>
 									<td><c:out value="${message.startDatetime}" /></td>
 									<td><c:out value="${message.endDatetime}" /></td>
 									<td>

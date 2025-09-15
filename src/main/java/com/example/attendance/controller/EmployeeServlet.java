@@ -2,7 +2,10 @@ package com.example.attendance.controller;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -52,8 +55,32 @@ public class EmployeeServlet extends HttpServlet {
         request.setAttribute("status", status.trim());
         
         // すべての連絡事項を取得して表示
-        List<Message> messages = messageDAO.getAllMessages();
-        request.setAttribute("messages", messages);
+        List<Message> allMessages = messageDAO.getAllMessages();
+        
+        LocalDateTime now = LocalDateTime.now();
+		List<Message> filteredMessages = allMessages.stream()
+		    .filter(m -> !now.isBefore(m.getStartDatetime()) && !now.isAfter(m.getEndDatetime()))
+		    .collect(Collectors.toList());
+        
+        Collections.sort(filteredMessages, new Comparator<Message>() {
+		    @Override
+		    public int compare(Message m1, Message m2) {
+		        int p1 = getPriorityValue(m1.getPriority());
+		        int p2 = getPriorityValue(m2.getPriority());
+		        // 降順ソート
+		        return Integer.compare(p2, p1);
+		    }
+
+		    private int getPriorityValue(String priority) {
+		        switch (priority) {
+		            case "high": return 3;
+		            case "normal": return 2;
+		            case "low": return 1;
+		            default: return 0;
+		        }
+		    }
+		});
+        request.setAttribute("messages", filteredMessages);
 
         request.getRequestDispatcher("/jsp/employee.jsp").forward(request, response);
     }
