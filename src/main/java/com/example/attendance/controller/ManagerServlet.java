@@ -11,6 +11,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import com.example.attendance.dao.AttendanceDAO;
 import com.example.attendance.dao.MessageDAO;
@@ -27,6 +28,16 @@ public class ManagerServlet extends HttpServlet {
     private final MessageDAO messageDAO = new MessageDAO();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+        User user = (User) session.getAttribute("user");
+        
+        // セッションから取得したユーザー名をリクエストスコープにセット
+        request.setAttribute("username", user.getUsername());
+        
         String action = request.getParameter("action");
         if (action == null) {
             action = "dashboard"; // Ensure action is never null
