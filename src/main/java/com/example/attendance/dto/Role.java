@@ -7,7 +7,7 @@ package com.example.attendance.dto;
 public class Role {
     private int roleId;
     private String rolename;
-    private String rolecategory; // DBのrolecategoryに対応
+    private String rolecategory; // DBのrolecategory = 'original','department','position','qualification'に対応
 
     public Role(String rolename, String rolecategory) {
     	this.rolename = rolename;

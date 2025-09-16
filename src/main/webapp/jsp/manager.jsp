@@ -22,9 +22,9 @@
 		<h1>管理者 <c:out value="${username}" /> さん</h1>
 	</header>
 	<nav>
-		<a href="${pageContext.request.contextPath}/manager?action=view_attendance">勤怠管理</a>
-		<a href="${pageContext.request.contextPath}/manager?action=view_users">ユーザー管理</a>
-		<a href="${pageContext.request.contextPath}/manager?action=view_messages">連絡事項管理</a>
+		<a href="${pageContext.request.contextPath}/manager?action=view_attendance"　class="<c:if test="${page == 'attendance'}">active</c:if>">勤怠管理</a>
+		<a href="${pageContext.request.contextPath}/manager?action=view_users"　class="<c:if test="${page == 'users'}">active</c:if>">ユーザー管理</a>
+		<a href="${pageContext.request.contextPath}/manager?action=view_messages" class="<c:if test="${page == 'messages'}">active</c:if>">連絡事項管理</a>
 		<a href="${pageContext.request.contextPath}/logout">ログアウト</a>
 	</nav>
 	<c:if test="${not empty disabledMessage}">
@@ -69,9 +69,6 @@
 						</div>
 					</div>
 					<h3>従業員全体の勤怠履歴</h3>
-					<div class="contentbox">
-					</div>
-					<h4>詳細勤怠履歴</h4>
 					<div class="contentbox">
 						<div class="form-section">
 							<form action="manager" method="get">
@@ -222,16 +219,20 @@
 					<div class="form-section">
 						<h3>連絡/告知事項の新規作成</h3>
 						<form action="manager" method="post">
+						<div class="message-form">
 							<input type="hidden" name="action" value="add_message">
-							<textarea name="message_text" placeholder="メッセージ" required></textarea>
-							<select name="priority">
-								<option value="high">高</option>
-								<option value="normal">中</option>
-								<option value="low">低</option>
-							</select>
-							<label>開始日時: <input type="datetime-local" name="start_datetime" required></label>
-							<label>終了日時: <input type="datetime-local" name="end_datetime" required></label>
-							<input type="submit" value="作成">
+							<textarea class="message-text" name="message_text" placeholder="メッセージ" required></textarea>
+							<div class="message-setting">
+								<select name="priority">
+									<option value="high">高</option>
+									<option value="normal">中</option>
+									<option value="low">低</option>
+								</select>
+								<label>開始日時: <input type="datetime-local" name="start_datetime" required></label>
+								<label>終了日時: <input type="datetime-local" name="end_datetime" required></label>
+								<input type="submit" value="作成">
+							</div>
+						</div>
 						</form>
 					</div>
 					<h3>連絡/告知事項一覧</h3>
@@ -283,7 +284,7 @@
 					
 				</c:when>
 				<c:otherwise>
-					<h2>ようこそ、管理者様</h2>
+					<h2>ようこそ、管理者 <c:out value="${username}" /> さん</h2>
 					<p>上のメニューから操作を選択してください。</p>
 				</c:otherwise>
 			</c:choose>

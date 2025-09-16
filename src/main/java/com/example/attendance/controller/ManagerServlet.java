@@ -217,10 +217,6 @@ public class ManagerServlet extends HttpServlet {
                 Collections.sort(filteredMessages, Comparator.comparing(Message::getMessageId).reversed());
                 request.setAttribute("messages", filteredMessages);
                 break;
-            default:
-                // If action is unknown, default to dashboard
-                page = "dashboard";
-                break;
             case "view_roles": // 追加：ロール一覧表示
                 page = "roles";
                 try {
@@ -257,6 +253,10 @@ public class ManagerServlet extends HttpServlet {
                     }
                 }
                 request.setAttribute("users", users);
+                break;
+            default:
+                // If action is unknown, default to dashboard
+                page = "dashboard";
                 break;
         }
         request.setAttribute("page", page);
@@ -366,16 +366,22 @@ public class ManagerServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/manager?action=view_messages");
                 break;
             case "add_role": // 追加：ロール追加
-                String rolename = request.getParameter("rolename");
+            	String rolename = request.getParameter("rolename");
                 String rolecategory = request.getParameter("rolecategory");
-                Role newRole = new Role(rolename, rolecategory);
+
                 try {
-                    roleDAO.insertRole(newRole);
+                    if (roleDAO.isRoleNameExists(rolename)) {
+                        request.getSession().setAttribute("errorMessage", "そのロール名はすでに存在します。");
+                    } else {
+                        Role newRole = new Role(rolename, rolecategory);
+                        roleDAO.insertRole(newRole);
+                        request.getSession().setAttribute("message", "新しいロール「" + rolename + "」が追加されました。");
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    request.setAttribute("errorMessage", "ロールの追加に失敗しました。");
+                    request.getSession().setAttribute("errorMessage", "ロールの追加中にエラーが発生しました。");
                 }
-                response.sendRedirect(request.getContextPath() + "/manager?action=view_roles");
+                response.sendRedirect(request.getContextPath() + "/manager?action=view_users");
                 break;
             case "delete_role": // 追加：ロール削除
                 try {
@@ -388,7 +394,7 @@ public class ManagerServlet extends HttpServlet {
                     e.printStackTrace();
                     request.setAttribute("errorMessage", "ロールの削除に失敗しました。");
                 }
-                response.sendRedirect(request.getContextPath() + "/manager?action=view_roles");
+                response.sendRedirect(request.getContextPath() + "/manager?action=view_users");
                 break;
             default:
                 response.sendRedirect(request.getContextPath() + "/manager");

@@ -156,6 +156,19 @@ input[type="password"] {
 
 .employeepage h2 {
 	color: #5c95da;
+	font-weight: bold;
+}
+
+.employeepage .contentbox .content-inner {
+	margin: 0 1rem 1rem;
+}
+
+.employeepage .contentbox .content-inner .data {
+	display: flex;
+}
+
+.employeepage .contentbox .content-inner .data p {
+	margin-right: 1rem;
 }
 
 .employeepage .message-item {
@@ -244,6 +257,11 @@ input[type="password"] {
 
 .managerpage h2 {
 	color: #5c95da;
+	font-weight: bold;
+}
+
+.managerpage .message-text {
+	width: 100%;
 }
 
 .managerpage table {

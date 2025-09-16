@@ -17,9 +17,25 @@ import com.example.attendance.dto.Role;
  */
 public class RoleDAO {
 
-    public RoleDAO() {
+    /**
+     * 指定されたロール名がすでに存在するかどうかを確認します。
+     * * @param rolename 確認するロール名
+     * @return 存在する場合はtrue、それ以外はfalse
+     * @throws SQLException データベースアクセスエラーが発生した場合
+     */
+    public boolean isRoleNameExists(String rolename) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM roles WHERE rolename = ?";
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, rolename);
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
     }
-
     /**
      * 新しい役割をデータベースに挿入します。
      *
@@ -34,7 +50,10 @@ public class RoleDAO {
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, role.getRolename());
-            statement.setString(2, role.getRolecategory());
+            PGobject roleCategoryObject = new PGobject();
+            roleCategoryObject.setType("rolecategory");
+            roleCategoryObject.setValue(role.getRolecategory());
+            statement.setObject(2, roleCategoryObject);
 
             int rowsAffected = statement.executeUpdate();
             if (rowsAffected > 0) {

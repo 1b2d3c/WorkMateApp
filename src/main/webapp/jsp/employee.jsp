@@ -73,8 +73,12 @@
 			</div>
 			<h2>Status</h2>
 			<div class="contentbox">
-			    <p>総労働時間: <strong><c:out value="${totalWorkingTime}" /></strong></p>
-                <h2>月次レポート</h2>
+				<div class="content-inner">
+					<div class="data">
+						<p>これまでの</p>
+					    <p>総労働時間: <strong><c:out value="${totalWorkingTime}" /></strong></p>
+					    <p>総出勤回数: <strong><c:out value="${totalCheckIns}" />回</strong></p>
+				    </div>
                     <div class="monthly-report">
                         <form action="${pageContext.request.contextPath}/employee" method="get">
                             <input type="hidden" name="action" value="monthly_summary">
@@ -90,12 +94,15 @@
                             </select>
                             <input type="submit" value="表示">
                         </form>
-                        <c:if test="${not empty selectedYear}">
-		                    <h3><c:out value="${selectedYear}" />年 <c:out value="${selectedMonth}" />月の集計</h3>
-		                    <p>総労働時間: <strong><c:out value="${monthlyTotalTime}" /></strong></p>
-		                    <p>出勤回数: <strong><c:out value="${checkInCount}" />回</strong></p>
-		                </c:if>
+                        <div class="data">
+	                        <c:if test="${not empty selectedYear}">
+			                    <p><c:out value="${selectedYear}" />年 <c:out value="${selectedMonth}" />月の</p>
+			                    <p>総労働時間: <strong><c:out value="${monthlyTotalTime}" /></strong></p>
+			                    <p>出勤回数: <strong><c:out value="${checkInCount}" />回</strong></p>
+			                </c:if>
+		                </div>
                     </div>
+                </div>
 			</div>
 			<h2>Work Records</h2>
 			<div class="contentbox">

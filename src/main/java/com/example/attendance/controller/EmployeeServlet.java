@@ -80,14 +80,19 @@ public class EmployeeServlet extends HttpServlet {
 
 	    // 【修正箇所】総労働時間の計算をアクションの条件分岐の外に移動
 	    long totalMinutes = 0;
+	    int totalCheckIns = 0; // 総出勤回数
 	    for (Attendance attendance : attendanceList) {
-	        if (attendance.getCheckInTime() != null && attendance.getCheckOutTime() != null) {
-	            totalMinutes += Duration.between(attendance.getCheckInTime(), attendance.getCheckOutTime()).toMinutes();
+	        if (attendance.getCheckInTime() != null) {
+	            totalCheckIns++;
+	            if (attendance.getCheckOutTime() != null) {
+	                totalMinutes += Duration.between(attendance.getCheckInTime(), attendance.getCheckOutTime()).toMinutes();
+	            }
 	        }
 	    }
 	    long totalHours = totalMinutes / 60;
 	    long remainingMinutes = totalMinutes % 60;
 	    request.setAttribute("totalWorkingTime", String.format("%d時間 %d分", totalHours, remainingMinutes));
+	    request.setAttribute("totalCheckIns", totalCheckIns);
 
 	    // 【修正箇所】月次レポートの計算ロジックも独立させる
 	    String action = request.getParameter("action");
