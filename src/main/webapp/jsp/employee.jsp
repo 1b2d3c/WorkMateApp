@@ -6,12 +6,12 @@
 
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c&family=Yusei+Magic&display=swap" rel="stylesheet">
-<title>従業員ダッシュボード</title>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/style.css">
+	<meta charset="UTF-8">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c&family=Yusei+Magic&display=swap" rel="stylesheet">
+	<title>従業員ダッシュボード</title>
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/style.css">
 </head>
 <body class="employeepage">
 	<header>
@@ -66,11 +66,36 @@
 							</p>
 						</div>
 					</c:forEach>
+					<c:if test="${empty messages}">
+                        <li>現在、表示期間内の連絡事項はありません。</li>
+                    </c:if>
 				</div>
 			</div>
 			<h2>Status</h2>
 			<div class="contentbox">
-				
+			    <p>総労働時間: <strong><c:out value="${totalWorkingTime}" /></strong></p>
+                <h2>月次レポート</h2>
+                    <div class="monthly-report">
+                        <form action="${pageContext.request.contextPath}/employee" method="get">
+                            <input type="hidden" name="action" value="monthly_summary">
+                            <select name="year">
+                                <c:forEach var="y" begin="2020" end="2025">
+                                    <option value="${y}" <c:if test="${selectedYear == y}">selected</c:if>>${y}年</option>
+                                </c:forEach>
+                            </select>
+                            <select name="month">
+                                <c:forEach var="m" begin="1" end="12">
+                                    <option value="${m}" <c:if test="${selectedMonth == m}">selected</c:if>>${m}月</option>
+                                </c:forEach>
+                            </select>
+                            <input type="submit" value="表示">
+                        </form>
+                        <c:if test="${not empty selectedYear}">
+		                    <h3><c:out value="${selectedYear}" />年 <c:out value="${selectedMonth}" />月の集計</h3>
+		                    <p>総労働時間: <strong><c:out value="${monthlyTotalTime}" /></strong></p>
+		                    <p>出勤回数: <strong><c:out value="${checkInCount}" />回</strong></p>
+		                </c:if>
+                    </div>
 			</div>
 			<h2>Work Records</h2>
 			<div class="contentbox">

@@ -9,6 +9,7 @@ public class User {
     private String password;
     private String role; // DBのuser_role_typeに対応
     private boolean enabled;
+    private String totalWorkingTime;
 
     public User(String username, String password, String role, boolean enabled) {
     	this.username = username;
@@ -68,5 +69,13 @@ public class User {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+    
+    public String getTotalWorkingTime() {
+        return totalWorkingTime;
+    }
+
+    public void setTotalWorkingTime(String totalWorkingTime) {
+        this.totalWorkingTime = totalWorkingTime;
     }
 }

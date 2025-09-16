@@ -1,12 +1,16 @@
 package com.example.attendance.controller; 
  
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.servlet.ServletException;
@@ -97,9 +101,79 @@ public class ManagerServlet extends HttpServlet {
                 request.setAttribute("attendanceList", attendanceList);
                 page = "attendance";
                 break;
+            case "export_attendance_csv":
+                response.setContentType("text/csv; charset=UTF-8");
+                response.setHeader("Content-Disposition", "attachment; filename=\"attendance.csv\"");
+                
+                List<Attendance> attendanceList1;
+                String userIdParam1 = request.getParameter("user_id");
+                String startDateStr = request.getParameter("start_date");
+                String endDateStr = request.getParameter("end_date");
+                
+                // フィルタリングロジック
+                if (userIdParam1 != null && !userIdParam1.isEmpty()) {
+                    try {
+                        int userId = Integer.parseInt(userIdParam1);
+                        if (startDateStr != null && !startDateStr.isEmpty() && endDateStr != null && !endDateStr.isEmpty()) {
+                            LocalDateTime startDate = LocalDateTime.parse(startDateStr + "T00:00:00");
+                            LocalDateTime endDate = LocalDateTime.parse(endDateStr + "T23:59:59");
+                            attendanceList1 = attendanceDAO.getAttendanceByUserIdAndDateRange(userId, startDate, endDate);
+                        } else {
+                            attendanceList1 = attendanceDAO.getAttendanceByUserId(userId);
+                        }
+                    } catch (NumberFormatException e) {
+                        System.err.println("Invalid user ID format for CSV export.");
+                        attendanceList1 = new ArrayList<>();
+                    }
+                } else {
+                    // 全勤怠記録を取得
+                    attendanceList1 = attendanceDAO.getAllAttendance();
+                }
+                long totalMinutes = 0;
+                Set<Integer> uniqueUsers = new HashSet<>();
+                
+                try (PrintWriter writer = response.getWriter()) {
+                    writer.println("ID,ユーザーID,出勤時刻,退勤時刻");
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                    for (Attendance attendance : attendanceList1) {
+                        String checkOutTime = (attendance.getCheckOutTime() != null) ? attendance.getCheckOutTime().format(formatter) : "-";
+                        if (attendance.getCheckOutTime() != null) {
+                            checkOutTime = attendance.getCheckOutTime().format(formatter);
+                            // 【追加】勤務時間を計算
+                            Duration duration = Duration.between(attendance.getCheckInTime(), attendance.getCheckOutTime());
+                            totalMinutes += duration.toMinutes();
+                        }
+                        // 【追加】勤務ユーザー数をカウント
+                        uniqueUsers.add(attendance.getUserId());
+
+                        writer.printf("%d,%d,%s,%s\n",
+                            attendance.getAttendanceId(),
+                            attendance.getUserId(),
+                            attendance.getCheckInTime().format(formatter),
+                            checkOutTime
+                        );
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return; // レスポンスを送信後、フォワードしない
             case "view_users":
                 page = "users";
                 List<User> allUsers = userDAO.getAllUsers();
+                for (User u : allUsers) {
+                    long totalMinutes1 = 0;
+                    List<Attendance> userAttendance = attendanceDAO.getAttendanceByUserId(u.getUserId());
+                    for (Attendance a : userAttendance) {
+                        if (a.getCheckInTime() != null && a.getCheckOutTime() != null) {
+                            totalMinutes1 += Duration.between(a.getCheckInTime(), a.getCheckOutTime()).toMinutes();
+                        }
+                    }
+                    long totalHours = totalMinutes1 / 60;
+                    long remainingMinutes = totalMinutes1 % 60;
+                    u.setTotalWorkingTime(String.format("%d時間 %d分", totalHours, remainingMinutes));
+                }
+                
+                allUsers.sort(Comparator.comparing(User::getUserId).reversed());
                 request.setAttribute("users", allUsers);
                 break;
             case "view_messages":

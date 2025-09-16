@@ -37,6 +37,20 @@
 			<c:choose>
 				<c:when test="${page == 'attendance'}">
 					<h2>勤怠管理</h2>
+					<h3>勤怠記録のエクスポート</h3>
+				    <div class="contentbox">
+				        <div class="form-section">
+				            <form action="manager" method="get">
+				                <input type="hidden" name="action" value="export_attendance_csv">
+				                <input type="text" name="user_id" placeholder="ユーザーID (任意)">
+				                <label>開始日:</label>
+				                <input type="date" name="start_date">
+				                <label>終了日:</label>
+				                <input type="date" name="end_date">
+				                <input type="submit" value="CSVエクスポート">
+				            </form>
+				        </div>
+				    </div>
 					<h3>勤怠履歴の追加/削除</h3>
 					<div class="contentbox">
 						<div class="form-section">
@@ -163,6 +177,7 @@
 								<th>ユーザー名</th>
 								<th>ロール</th>
 								<th>有効</th>
+								<th>総労働時間</th>
 								<th>操作</th>
 							</tr>
 						</thead>
@@ -188,6 +203,7 @@
                                             </select>
                                         </form>
                                     </td>
+                                    <td><c:out value="${user.totalWorkingTime}" /></td>
 									<td>
 										<form action="manager" method="post" style="display:inline;">
 											<input type="hidden" name="action" value="delete_user">
