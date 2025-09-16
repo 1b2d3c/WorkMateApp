@@ -179,6 +179,7 @@ public class ManagerServlet extends HttpServlet {
             case "view_messages":
                 page = "messages";
                 List<Message> allMessages = messageDAO.getAllMessages();
+                
                 String filter = request.getParameter("filter");
                 
                 List<Message> filteredMessages;
@@ -213,6 +214,7 @@ public class ManagerServlet extends HttpServlet {
                         }
                     }
                 });
+                Collections.sort(filteredMessages, Comparator.comparing(Message::getMessageId).reversed());
                 request.setAttribute("messages", filteredMessages);
                 break;
             default:
