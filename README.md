@@ -1,4 +1,4 @@
-前期審査会JavaServletアプリ開発
+JavaServletアプリ開発
 
 勤怠管理アプリ WorkMate
 
